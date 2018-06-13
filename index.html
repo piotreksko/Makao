@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Makao (WIP)</title>
+  
+  
+  <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.css'>
+
+      <link rel="stylesheet" href="css/style.css">
+
+  
+</head>
+
+<body>
+
+  <html lang="en">
+
+   <head>
+      <meta charset="UTF-8">
+      <title>Makao</title>
+
+      <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.css'>
+      <!--<link rel="stylesheet" href="css/style.css">-->
+
+
+   </head>
+
+   <body>
+
+      <div id="newWeight" class="newWeight flex-container">Suit has been changed to: 
+      </div>
+
+      <div id="login-box" class="suit-popup flex-container">
+         <span>Pick card suit</span>
+         <div class="row">
+            <button id="hearts" class="suit-icon"><img class="icon-image" src="https://upload.wikimedia.org/wikipedia/commons/7/77/Heart_symbol_c00.png"></button>
+            <button id="diamonds" class="suit-icon"><img class="icon-image" src="https://www.spreadshirt.com/image-server/v1/designs/11631716,width=178,height=178/card-suit-diamond.png"></button>
+         </div>
+         <div class="row">
+            <button id="clubs" class="suit-icon"><img class="icon-image" src="http://www.clker.com/cliparts/U/3/0/g/Z/y/carte-de-trefla-md.png"></button>
+            <button id="spades" class="suit-icon"><img class="icon-image" src="https://image.freepik.com/free-icon/spades-symbol_318-40683.jpg"></button>
+         </div>
+      </div>
+
+            <div id="jack-box" class="suit-popup flex-container">
+         <span>Pick card suit</span>
+         <div class="row">
+            <button id="demand5" class="suit-icon">5</button>
+            <button id="demand6" class="suit-icon">6</button>
+            <button id="demand7" class="suit-icon">7</button>
+            <button id="demand8" class="suit-icon">8</button>
+            <button id="demand9" class="suit-icon">9</button>
+            <button id="demand10" class="suit-icon">10</button>
+            <button id="demandQ" class="suit-icon">Q</button>
+            <button id="demandNone" class="suit-icon">No demand</button>
+         </div>
+      </div>
+      
+      <div class="flex-container" id="cpuContainer"><div id="cpuCardsCounter" class="row"></div><div class="row" id="cpuCards"></div></div>
+      <br>
+      <div class="flex-container"> 
+         <div id="deckCounter"></div>
+         <div class="card" id="deck"> </div>
+         <div id="pile"> </div>
+         <div id="pileCounter"> </div>
+
+      </div>
+      <br>
+      <div class="flex-container" id="playerContainer"><div class="row">Your cards</div><div class="row"  id="playerCards"></div></div>
+      <div id="topCard"> </div>
+      <div class="buttons">
+         <button id="confirmCards" class="btn btn-success" data-toggle="confirmation" data-singleton="true">Confirm cards</button>
+         <button id="resetCards" class="btn btn-danger" data-toggle="confirmation" data-singleton="true">Reset chosen cards</button>
+         <button id="waitTurn" class="btn btn-primary invisible" data-toggle="confirmation" data-singleton="true">Wait</button>
+      </div>
+      <div id="noCards"> </div>
+      <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+
+      <!--<script src="js/index.js"></script>-->
+   </body>
+
+</html>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+
+  
+
+    <script  src="js/index.js"></script>
+
+
+
+
+</body>
+
+</html>
