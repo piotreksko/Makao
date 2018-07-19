@@ -161,6 +161,11 @@ function cpuMove() {
          });
 
          console.log(possibleMoves);
+         debugger;
+         let mostMoves = possibleMoves.reduce(function(prev, curr) {
+           return prev.possibleCardsAfter < curr.possibleCardsAfter ? prev : curr;
+         });
+         console.log(mostCards);
 
          var min = 1;
          var max = cpuAvailableCards.length;
@@ -169,6 +174,7 @@ function cpuMove() {
          cpuCards.splice(randomNumber, 1);
          pile.push(cpuSelectedCard);
          cpuAvailableCards = [];
+
       } else {
          console.log("no cards available");
          //Take cards from pile and shuffle the deck if there is one card left
