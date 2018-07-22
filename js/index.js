@@ -1,18 +1,23 @@
-var playerCards = [],
+let playerCards = [],
     cpuCards = [],
     deck = [],
     pile = [],
-    nextTurn = void 0,
+    nextTurn = 0,
     availableCards = [],
     selectedCards = [],
-    lastCard = void 0,
-    chosenWeight = void 0,
-    chosenType = void 0,
+    lastCard = 0,
+    chosenWeight = 0,
+    chosenType = 0,
     jackActive = 0,
+    aceActive = 0,
     cardsToTake = 1,
-    waitTurn = 0;
-var cardTypes = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"];
-var cardWeights = ["clubs", "diamonds", "spades", "hearts"];
+    waitTurn = 0,
+    cpuWait = 0,
+    playerWait = 0,
+    battleCardActive = 0;
+    changeDemand = 0;
+let cardTypes = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"];
+let cardWeights = ["clubs", "diamonds", "spades", "hearts"];
 
 //Init game
 getDeck();
@@ -32,7 +37,7 @@ function getDeck() {
       });
    };
 
-   var getRandomInt = function getRandomInt(min, max) {
+   let getRandomInt = function getRandomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
    };
 
@@ -42,11 +47,11 @@ function getDeck() {
    //Give out cards
    function assignCards(assignedCards) {
       assignedCards1 = deck.splice(0, 5);
-      assignedCards2 = deck.splice(0, 15);
+      assignedCards2 = deck.splice(0, 5);
 
       //Always start game with a neutral card
 
-      for (var i = 0; i < deck.length; i++) {
+      for (let i = 0; i < deck.length; i++) {
          switch (deck[i].type) {
             case "5":
             case "6":
@@ -70,7 +75,7 @@ function getDeck() {
 };
 
 function shuffleDeck(array) {
-   var currentIndex = array.length,
+   let currentIndex = array.length,
        temporaryValue,
        randomIndex;
 
@@ -98,12 +103,13 @@ function compare(a, b) {
 
 function sortCards(array) {
    return array.sort(function (a, b) {
-      var compString = "'2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king' , 'ace'";
+      const compString = "'2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king' , 'ace'";
       return compString.indexOf(a.type) - compString.indexOf(b.type);
    });
 }
 
 function renderCards() {
+   checkCardsToTake();
    renderPlayerCards();
    renderCpuCards();
    renderPile();
@@ -123,24 +129,40 @@ function updateCardsCounter() {
 
 //CPU move
 function cpuMove() {
-
+  sortCards(cpuCards);
    if (nextTurn) {
       console.log(lastCard);
       console.log(cpuCards);
-      var cpuAvailableCards = cpuCards.filter(function (card) {
-         return lastCard.weight == card.weight || lastCard.type == card.type;
+
+      let allCpuCard = cpuCards;
+      let cardsToUse = [];
+      let cpuAvailableCards = [];
+      let typeToUse;
+      cpuAvailableCards = cpuCards.filter(function (card) {
+         return card.weight == lastCard.weight || card.type == lastCard.type;
       });
+      if (lastCard.type == 'ace'){
+        cpuAvailableCards = cpuCards.filter(function (card) {
+           return card.weight == chosenWeight || card.type == lastCard.type;
+        });
+      }
+
+      if (jackActive) {
+        cpuAvailableCards = cpuCards.filter(function (card) {
+           return "jack" == card.type || card.type == chosenType;
+        });
+      }
       console.log(cpuAvailableCards);
       //IF CPU does have available cards
-      if (cpuAvailableCards[0]) {
+      if (cpuAvailableCards.length) {
          console.log("cpu had available cards");
-
-         var possibleMoves = cpuAvailableCards.map(function (card) {
+         aceActive = 0;
+         let cpuPossibleMoves = cpuAvailableCards.map(function (card) {
             return {
                type: card.type,
                weight: card.weight,
                sameTypeAmount: function () {
-                  var amount = 0;
+                  let amount = 0;
                   cpuCards.forEach(function (e) {
                      if (e.type === card.type) {
                         amount += 1;
@@ -148,8 +170,8 @@ function cpuMove() {
                   });
                   return amount - 1;
                }(),
-               possibleCardsAfter: function () {
-                  var moves = 0;
+               sameWeightAmount: function () {
+                  let moves = 0;
                   cpuCards.forEach(function (e) {
                      if (e.weight === card.weight) {
                         moves += 1;
@@ -160,38 +182,367 @@ function cpuMove() {
             };
          });
 
-         console.log(possibleMoves);
-         debugger;
-         let mostMoves = possibleMoves.reduce(function(prev, curr) {
-           return prev.possibleCardsAfter < curr.possibleCardsAfter ? prev : curr;
+         console.log(cpuPossibleMoves);
+         let neutralCards = cpuPossibleMoves.filter((card) => {
+            return card.type == "5" || card.type == "6" || card.type == "7" || card.type == "8" || card.type == "9" || card.type == "10" || card.type == "queen" || (card.type == "king" && card.weight == "diamonds") || (card.type == "king" && card.weight == "clubs");
          });
-         console.log(mostCards);
 
-         var min = 1;
-         var max = cpuAvailableCards.length;
-         var randomNumber = Math.floor(Math.random() * max) + min;
-         var cpuSelectedCard = cpuCards[randomNumber];
-         cpuCards.splice(randomNumber, 1);
-         pile.push(cpuSelectedCard);
-         cpuAvailableCards = [];
 
-      } else {
-         console.log("no cards available");
-         //Take cards from pile and shuffle the deck if there is one card left
-         if (deck.length === 1) {
-            var cardsForShuffle = pile;
-            shuffleDeck(cardsForShuffle);
-            deck = deck.concat(cardsForShuffle);
-            pile.splice(0, deck.length - 2);
+         let battleCards = cpuPossibleMoves.filter((card) => {
+            return card.type == "2" || card.type == "3" || (card.type == "king" && card.weight == "hearts") || (card.type == "king" && card.weight == "spades") ;
+         });
+
+         let fours = cpuPossibleMoves.filter((card) => {
+            return card.type == "4";
+         });
+
+         let jacks = cpuPossibleMoves.filter((card) => {
+            return card.type == "jack";
+         });
+
+         let aces = cpuPossibleMoves.filter((card) => {
+            return card.type == "ace";
+         });
+
+         let kings = cpuPossibleMoves.filter((card) => {
+           console.log((card.type == "king" && card.weight == "diamonds") || (card.type == "king" && card.weight == "clubs"));
+            return (card.type == "king" && card.weight == "diamonds") || (card.type == "king" && card.weight == "clubs");
+         });
+         if (jacks.length && !battleCardActive && !cpuWait){
+          if (neutralCards.length === 1)
+          cardsToUse = jacks
          }
 
-         cardFromDeck = deck[0];
-         deck.shift();
-         cpuCards.push(cardFromDeck);
+         console.log(neutralCards);
+         console.log(battleCards);
+         console.log(fours);
+         console.log(jacks);
+         console.log(aces);
+
+         let cardsDifference;
+         cpuCards.length - playerCards.length > 0 ? cardsDifference = cpuCards.length - playerCards.length : cardsDifference = 0;
+         if (cpuCards.length == playerCards.length) {
+           cardsDifference = 1;
+         }
+         let neutralChance = neutralValue();
+         let battleChance = battleValue();
+         let foursChance = foursValue();
+         let jacksChance = jacksValue();
+         let acesChance = acesValue();
+         let kingsChance = kingsValue();
+
+         console.log(battleCardActive);
+         console.log(waitTurn);
+         console.log(neutralCards.length);
+
+         function neutralValue (){
+           if (neutralCards.length === 0 || battleCardActive || waitTurn || cpuWait) {
+             return 0;
+           }
+           else {
+             let weight = 15;
+             let value = neutralCards.length * weight;
+             return value
+           }
+         }
+         function battleValue () {
+           if (battleCards.length === 0 || waitTurn || cpuWait || jackActive) {
+             return 0
+           }
+           else {
+             let weight = 6;
+             let value = battleCards.length * weight + Math.pow(cardsDifference, 2)/10 * weight;
+             return value
+           }
+         }
+         function foursValue () {
+           if (fours.length === 0 || battleCardActive || jackActive || cpuWait) {
+             return 0;
+           }
+           else {
+             let weight = 1;
+             let foursOnPile = pile.filter(x => x.type === "4").length;
+             let foursLeft = checkFours();
+
+             function checkFours(){
+               if (4 - foursOnPile - fours.length === 0){
+                 weight = 500;
+               }
+               else if (4 - foursOnPile - fours.length === 1) {
+                 weight = 20;
+               }
+               else if (4 - foursOnPile - fours.length === 2) {
+                 weight = 5;
+               }
+               else {
+                 weight = 2;
+               }
+             }
+
+             let value = weight*deck.length/playerCards.length;
+             return value
+           }
+         }
+         function jacksValue () {
+           if (jacks.length === 0 || battleCardActive || waitTurn || cpuWait ) {
+             return 0;
+           }
+           else {
+             let jacksWeight = 24;
+             console.log(jacksWeight);
+             let jackNeutralRatio = 1
+             if (neutralCards.length) {
+               jackNeutralRatio = jacksWeight/neutralCards.length;
+             };
+             console.log(jacksWeight/cardsDifference);
+             let value = jacks.length * jackNeutralRatio + (cardsDifference/jacksWeight)*3 + (jacksWeight/playerCards.length)*2;
+             return value
+           }
+         }
+         function acesValue () {
+           if (aces.length === 0 || battleCardActive || waitTurn || cpuWait || jackActive) {
+             return 0;
+           }
+           else {
+             let weight = 3;
+             let value = (aces.length * weight) + (cpuCards.length/cpuAvailableCards.length)*weight;
+             return value
+           }
+         }
+         function kingsValue () {
+           console.log((kings.length && lastCard.type == "king" && lastCard.weight == "hearts"));
+           console.log((kings.length && lastCard.type == "king" && lastCard.weight == "spades"))
+
+           if (kings.length && ((lastCard.type == "king" && lastCard.weight == "hearts") || (lastCard.type == "king" && lastCard.weight == "spades"))) {
+             return 15;
+           }
+           else {
+             return 0;
+           }
+         }
+         console.log(neutralChance);
+         console.log(battleChance);
+         console.log(foursChance);
+         console.log(jacksChance);
+         console.log(acesChance);
+
+         let min = 0;
+         let max = neutralChance + battleChance + foursChance + jacksChance + acesChance + kingsChance;
+         let previousUpperRange = 0;
+
+         let neutralRange = calculateRange(neutralChance);
+         let battleRange = calculateRange(battleChance);
+         let foursRange = calculateRange(foursChance);
+         let jacksRange = calculateRange(jacksChance);
+         let acesRange = calculateRange(acesChance);
+         let kingsRange = calculateRange(kingsChance);
+
+         function calculateRange (rangeWidth) {
+           previousUpperRange = previousUpperRange + rangeWidth;
+           if (rangeWidth){
+             previousUpperRange += rangeWidth;
+             return previousUpperRange;
+           }
+           else {
+             return 0;
+           }
+         };
+
+         let rand = function(min, max) {
+             return Math.random() * (max - min) + min;
+         };
+
+         let randomNumber = rand(min, max);
+         let weightPicked;
+         if (randomNumber < neutralRange){
+          cardsToUse = neutralCards;
+          weightPicked = 1;
+          console.log("its neutral");
+         }
+         else if (randomNumber < battleRange) {
+          cardsToUse = battleCards;
+          weightPicked = 2;
+          console.log("its battle");
+         }
+         else if (randomNumber < foursRange) {
+           cardsToUse = fours;
+           weightPicked = 3;
+           console.log("its fours");
+         }
+         else if (randomNumber < jacksRange) {
+           cardsToUse = jacks;
+           weightPicked = 4;
+           console.log("its jacks");
+         }
+         else if (randomNumber < acesRange) {
+           cardsToUse = aces;
+           weightPicked = 5;
+           console.log("its aces");
+         }
+         else if (randomNumber < kingsRange) {
+           cardsToUse = kings;
+           weightPicked = 6;
+           console.log("its kings");
+         }
+
+         if (jacks.length && neutralCards.length === 1) {
+           cardsToUse = jacks;
+           weightPicked = 4;
+         }
+
+         if (jackActive && weightPicked !== 4){
+           jackActive -=1;
+         }
+
+         console.log("randomNumber");
+         console.log(randomNumber);
+         console.log("neutralRange");
+         console.log(neutralRange);
+         console.log("battleRange");
+         console.log(battleRange);
+         console.log("foursRange");
+         console.log(foursRange);
+         console.log("jacksRange");
+         console.log(jacksRange);
+         console.log("acesRange");
+         console.log(acesRange);
+         console.log("kingsRange");
+         console.log(kingsRange);
+
+         if (randomNumber == 0) {
+           cpuNoCardsToUse();
+         }
+
+
+         else {
+
+           console.log("cardsToUse");
+           console.log(cardsToUse);
+
+         let mostMoves = cardsToUse.reduce((prev, curr) => prev.possibleCardsAfter < curr.possibleCardsAfter ? prev : curr);
+
+         console.log("mostMoves");
+         console.log(mostMoves);
+
+         let cpuSelectedCards = [];
+
+         if (!mostMoves.sameTypeAmount){
+          cpuAvailableCards = [];
+          cpuSelectedCards.push(mostMoves);
+         }
+         else {
+           cpuSelectedCards = cpuCards.filter(e => e.type == mostMoves.type);
+         }
+
+         cpuSelectedCards.forEach((card, idx) => {
+
+           let notCheckedYet = 1;
+           switch (card.type) {
+              case "2":
+                 cardsToTake += 2;
+                 break;
+              case "3":
+                 cardsToTake += 3;
+                 break;
+              case "4":
+                 waitTurn += 1;
+                 break;
+              case "jack":
+                jackActive = 2;
+                if (neutralCards.length) {
+                  chosenType = (neutralCards.reduce((prev, curr) => prev.sameTypeAmount < curr.sameTypeAmount ? prev : curr)).type;
+                  console.log("chosenType");
+                  console.log(chosenType);
+                  break;
+                };
+              case "ace":
+                if (notCheckedYet) {
+                aceActive = 1;
+                let cpuCardsWithoutMostMoves = cpuCards;
+                cpuCardsWithoutMostMoves.splice(cpuCardsWithoutMostMoves.indexOf(mostMoves), 1);
+                console.log((cpuCardsWithoutMostMoves.reduce((prev, curr) => prev.sameWeightAmount < curr.sameWeightAmount ? prev : curr)).weight);
+                chosenWeight = (cpuCardsWithoutMostMoves.reduce((prev, curr) => prev.sameWeightAmount < curr.sameWeightAmount ? prev : curr)).weight;
+                console.log("chosenWeight");
+                console.log(chosenWeight);
+              }
+                break;
+              case "king":
+                 if (card.weight === "hearts" || card.weight === "spades") {
+                    cardsToTake += 5;
+                    break;
+                 }
+
+                 //Kings of clubs and diamonds nullify amount of cards to be taken
+                 else {
+                    cardsToTake = 0;
+                    break;
+                    }
+           }
+          let cardForSplice;
+          pile.push(card);
+          var idx = cpuCards.findIndex((item) => item.type === card.type && item.weight === card.weight);
+          cpuCards.splice(idx, 1);
+         })
+        cpuAvailableCards = [];
+       }
+
+      } else {
+        cpuNoCardsToUse();
       }
       nextTurn = 0;
       renderCards();
    }
+}
+
+function cpuNoCardsToUse () {
+  console.log("no cards available");
+  //Take cards from pile and shuffle the deck if there is one card left
+
+  if (jackActive) {
+    jackActive -=1;
+  }
+
+  //Do nothing if last card was 4
+  if (waitTurn > 0) {
+    cpuWait = waitTurn - 1;
+    waitTurn = 0;
+    return;
+  } else if (cpuWait) {
+    cpuWait -= 1;
+  } else {
+     //Repeat the loop as many times as there are cards to be taken
+     if (cardsToTake > 1) {
+
+        //Shuffle the deck if there are not enough cards remaining in the deck
+        if (cardsToTake > deck.length) {
+           let cardsForShuffle = pile;
+           cardForShuffle.pop;
+           shuffleDeck(cardsForShuffle);
+           deck = deck.concat(cardsForShuffle);
+           pile.splice(0, deck.length - 2);
+        }
+        for (let i = 1; i < cardsToTake; i++) {
+           cardFromDeck = deck[0];
+           deck.shift();
+           cpuCards.push(cardFromDeck);
+        }
+     }
+
+     //Take one card - default amount
+     else {
+       if (deck.length === 1) {
+          let cardsForShuffle = pile;
+          cardForShuffle.pop;
+          shuffleDeck(cardsForShuffle);
+          deck = deck.concat(cardsForShuffle);
+          pile.splice(0, deck.length - 2);
+       }
+         cardFromDeck = deck[0];
+         deck.shift();
+         cpuCards.push(cardFromDeck);
+        }
+        cardsToTake = 1;
+      }
 }
 
 //Cards rendering
@@ -199,29 +550,42 @@ function renderPlayerCards() {
    $('#playerCards').empty();
    sortCards(playerCards);
    playerCards.forEach(function (card, i) {
-      var fileName = card.type + "_of_" + card.weight;
-      var url = 'https://res.cloudinary.com/bosmanone/image/upload/v1477397924/cards/' + fileName + '.png';
-      var cardDiv = "<div " + "id='" + i + "' class='card " + fileName + " cardsInHand' onclick='pickCard(this)' style='background-image: url(" + url + ");" + ");'></div>";
+      const fileName = card.type + "_of_" + card.weight;
+      const url = 'https://res.cloudinary.com/bosmanone/image/upload/v1477397924/cards/' + fileName + '.png';
+      const cardDiv = "<div " + "id='" + i + "' class='card " + fileName + " cardsInHand' onclick='pickCard(this)' style='background-image: url(" + url + ");" + ");'></div>";
       $('#playerCards').append(cardDiv);
    });
 };
+/*
+function renderCpuCards() {
+   $('#cpuCards').empty();
+   cpuCards.forEach(function (card, i) {
+     const fileName = card.type + "_of_" + card.weight;
+     const url = 'https://res.cloudinary.com/bosmanone/image/upload/v1477397924/cards/' + fileName + '.png';
+     const cardDiv = "<div " + "id='" + i + "' class='card " + fileName + " cardsInHand' onclick='pickCard(this)' style='background-image: url(" + url + ");" + ");'></div>";
+     $('#cpuCards').append(cardDiv);
+   });
+};
+*/
 
 function renderCpuCards() {
    $('#cpuCards').empty();
    cpuCards.forEach(function (card, i) {
-      var url = 'https://i.pinimg.com/originals/6c/a0/16/6ca016115a894f69dea75cc80f95ad92.jpg';
-      var cardDiv = "<div " + "id='" + i + "' class='card cardsInHand" + "'style='background-image: url(" + url + ");" + ");'></div>";
+      const url = 'https://i.pinimg.com/originals/6c/a0/16/6ca016115a894f69dea75cc80f95ad92.jpg';
+      const cardDiv = "<div " + "id='" + i + "' class='card cardsInHand" + "'style='background-image: url(" + url + ");" + ");'></div>";
       $('#cpuCards').append(cardDiv);
    });
 };
 
+
 function renderPile() {
    if (pile.length) {
       $('#pile').empty();
-      var numberOnPile = pile.length - 1;
-      var fileName = pile[numberOnPile].type + "_of_" + pile[numberOnPile].weight;
-      var url = 'https://res.cloudinary.com/bosmanone/image/upload/v1477397924/cards/' + fileName + '.png';
-      var lastCardImg = "<div class='card " + "'style='background-image: url(" + url + ");'></div>";
+
+      const numberOnPile = pile.length - 1
+      const fileName = pile[numberOnPile].type + "_of_" + pile[numberOnPile].weight;
+      const url = 'https://res.cloudinary.com/bosmanone/image/upload/v1477397924/cards/' + fileName + '.png';
+      const lastCardImg = "<div class='card " + "'style='background-image: url(" + url + ");'></div>";
       $('#pile').append(lastCardImg);
    } else {
       return;
@@ -231,17 +595,18 @@ function renderPile() {
 //Confirm cards
 $("#confirmCards").click(function () {
 
-   //Decrease jack and wait counters
-   if (jackActive > 0) {
+  if (!selectedCards) {
+    return;
+  }
+
+   //Decrease jack counter
+   if (jackActive) {
       jackActive -= 1;
-   }
-   if (waitTurn > 0) {
-      waitTurn -= 1;
    }
 
    //Battle cards - add cards to take accordingly
-   selectedCards.forEach(function (card, index) {
-      switch (card.type) {
+   selectedCards.forEach(function (e, index) {
+      switch (e.type) {
          case "2":
             cardsToTake += 2;
             break;
@@ -249,9 +614,19 @@ $("#confirmCards").click(function () {
             cardsToTake += 3;
             break;
          case "4":
+            if (!cpuWait) {
             waitTurn += 1;
+          }
+            break;
+          case "jack":
+            jackActive = 2;
+            changeDemand = 1;
+            break;
+          case "ace":
+            aceActive = 1;
+            break;
          case "king":
-            if (card.weight === "hearts" || card.weight === "spades") {
+            if (e.weight === "hearts" || e.weight === "spades") {
                cardsToTake += 5;
                break;
             }
@@ -264,23 +639,28 @@ $("#confirmCards").click(function () {
       }
 
       //Remove cards from playerCards
-      var index = playerCards.indexOf(card);
+      var index = playerCards.indexOf(e);
       playerCards.splice(index, 1);
    });
 
    pile = pile.concat(selectedCards);
 
    //Open a dialog box if ace or jack was used
-   if (selectedCards[0].type == "ace") {
+   if (aceActive) {
       openAceBox();
    };
-   if (selectedCards[0].type == "jack") {
+   if (jackActive && changeDemand) {
+      changeDemand = 0;
       openJackBox();
    };
    selectedCards = [];
    lastCard = pile[pile.length - 1];
+
    nextTurn = 1;
-   renderCards();
+
+   if(!aceActive && !jackActive){
+      renderCards();
+   }
 });
 
 //Reset selectedcards
@@ -291,55 +671,61 @@ $("#resetCards").click(function () {
 
 //Wait one turn
 $("#waitTurn").click(function () {
-   waitTurn -= 1;
-   checkAvailableCards();
+  if (playerWait) playerWait -= 1;
+  else {
+    playerWait = waitTurn - 1;
+    waitTurn = 0;
+  }
+   nextTurn = 1;
+   console.log("waiteeeeeeeeeeed");
+   renderCards();
 });
 
 //Take cards from deck
 $('#deck').click(function (cardFromDeck) {
-
+  console.log("cardsToTake");
+  console.log(cardsToTake);
    selectedCards = [];
    //Do nothing if last card was 4
-   if (lastCard.type == '4') {
+   if (waitTurn || playerWait) {
       return;
-   } else {
+   }
+   else {
 
       //Repeat the loop as many times as there are cards to be taken
       if (cardsToTake > 1) {
-
          //Shuffle the deck if there are not enough cards remaining in the deck
          if (cardsToTake > deck.length) {
-            var cardsForShuffle = pile;
+            let cardsForShuffle = pile;
+            cardsForShuffle.pop;
             shuffleDeck(cardsForShuffle);
             deck = deck.concat(cardsForShuffle);
             pile.splice(0, deck.length - 2);
          }
-         for (var i = 0; i < cardsToTake - 1; i++) {
+         for (let i = 1; i < cardsToTake; i++) {
             cardFromDeck = deck[0];
             deck.shift();
-            playerCards.push(deck[0]);
-            renderCards();
+            playerCards.push(cardFromDeck);
          }
       }
 
       //Take one card - default amount
       else {
             if (deck.length === 1) {
-               var _cardsForShuffle = pile;
-               shuffleDeck(_cardsForShuffle);
-               deck = deck.concat(_cardsForShuffle);
+               let cardsForShuffle = pile;
+               cardsForShuffle.pop;
+               shuffleDeck(cardsForShuffle);
+               deck = deck.concat(cardsForShuffle);
                pile.splice(0, deck.length - 2);
             }
 
             cardFromDeck = deck[0];
             deck.shift();
             playerCards.push(cardFromDeck);
-            renderCards();
          }
-
-      if (cardsToTake > 1) {
          cardsToTake = 1;
-      }
+         nextTurn = 1;
+         renderCards();
    }
 });
 
@@ -354,83 +740,76 @@ function removeMask() {
 $("#hearts").click(function () {
    chosenWeight = "hearts";
    removeMask();
-   checkAvailableCards();
+   renderCards();
 });
 $("#diamonds").click(function () {
    chosenWeight = "diamonds";
    removeMask();
-   checkAvailableCards();
+   renderCards();
 });
 $("#clubs").click(function () {
    chosenWeight = "clubs";
    removeMask();
-   checkAvailableCards();
+   renderCards();
 });
 $("#spades").click(function () {
    chosenWeight = "spades";
    removeMask();
-   checkAvailableCards();
+   renderCards();
 });
 $("#demand5").click(function () {
    chosenType = "5";
-   jackActive = 1;
    removeMask();
-   checkAvailableCards();
+   renderCards();
 });
 $("#demand6").click(function () {
    chosenType = "6";
-   jackActive = 1;
    removeMask();
-   checkAvailableCards();
+   renderCards();
 });
 $("#demand7").click(function () {
    chosenType = "7";
-   jackActive = 1;
    removeMask();
-   checkAvailableCards();
+   renderCards();
 });
 $("#demand8").click(function () {
    chosenType = "8";
-   jackActive = 1;
    removeMask();
-   checkAvailableCards();
+   renderCards();
 });
 $("#demand9").click(function () {
    chosenType = "9";
-   jackActive = 1;
    removeMask();
-   checkAvailableCards();
+   renderCards();
 });
 $("#demand10").click(function () {
    chosenType = "10";
-   jackActive = 1;
    removeMask();
-   checkAvailableCards();
+   renderCards();
 });
 $("#demandQ").click(function () {
    chosenType = "queen";
-   jackActive = 1;
    removeMask();
-   checkAvailableCards();
+   renderCards();
 });
 $("#demandNone").click(function () {
    jackActive = 0;
    removeMask();
-   checkAvailableCards();
+   renderCards();
 });
 
 //When ace is used
 function openAceBox() {
 
    // Getting the variable
-   var loginBox = $("#login-box");
+   const loginBox = $("#login-box");
 
    //Fade in the Popup and add close button
    $(loginBox).fadeIn(300);
 
    //Set the center alignment padding + border
-   var popMargTop = ($(loginBox).height() + 24) / 2;
-   var popMargLeft = ($(loginBox).width() + 24) / 2;
+   let popMargTop = ($(loginBox).height() + 24) / 2;
+   let popMargLeft = ($(loginBox).width() + 24) / 2;
 
    $(loginBox).css({
       'margin-top': -popMargTop,
@@ -441,21 +820,20 @@ function openAceBox() {
    $('body').append('<div id="mask"></div>');
    $('#mask').fadeIn(300);
 
-   return false;
 }
 
 //When jack is used
 function openJackBox() {
 
    // Getting the variable
-   var loginBox = $("#jack-box");
+   const loginBox = $("#jack-box");
 
    //Fade in the Popup and add close button
    $(loginBox).fadeIn(300);
 
    //Set the center alignment padding + border
-   var popMargTop = ($(loginBox).height() + 24) / 2;
-   var popMargLeft = ($(loginBox).width() + 24) / 2;
+   let popMargTop = ($(loginBox).height() + 24) / 2;
+   let popMargLeft = ($(loginBox).width() + 24) / 2;
 
    $(loginBox).css({
       'margin-top': -popMargTop,
@@ -466,12 +844,11 @@ function openJackBox() {
    $('body').append('<div id="mask"></div>');
    $('#mask').fadeIn(300);
 
-   return false;
 }
 
 //Click on your own card
-var pickCard = function pickCard(card) {
-   var cardId = $(card).attr('id');
+const pickCard = function pickCard(card) {
+   const cardId = $(card).attr('id');
 
    //Check if clicked card is available
    availableCards.forEach(function (availableCard) {
@@ -497,7 +874,7 @@ var pickCard = function pickCard(card) {
          if ($(card).hasClass('selected')) {
             $(card).removeClass("selected");
             $(card).addClass("removed");
-            for (var i = 0; i < selectedCards.length; i++) {
+            for (let i = 0; i < selectedCards.length; i++) {
                //Find index of the card to remove from selected
                if (selectedCards[i].type == playerCards[cardId].type && selectedCards[i].weight == playerCards[cardId].weight) {
                   selectedCards.splice(i, 1);
@@ -513,16 +890,23 @@ var pickCard = function pickCard(card) {
    checkAvailableCards();
 };
 
-function checkAvailableCards(battleCardActive) {
+//Check if a battle card was used - 2, 3, king of hearts or king of spades
+function checkCardsToTake() {
+   if (cardsToTake > 1) {
+      battleCardActive = 1;
+   } else {
+      battleCardActive = 0;
+   }
+}
+
+function checkAvailableCards() {
 
    $("#newWeight").fadeOut(100);
    lastCard = pile[pile.length - 1];
-   if (lastCard.type === "ace") {
-      lastCard.weight = chosenWeight;
+   if (aceActive) {
       $("#newWeight").fadeIn(300);
    }
-   if (lastCard.type === "jack") {
-      lastCard.type = chosenType;
+   if (jackActive) {
       $("#newType").fadeIn(300);
    }
 
@@ -532,7 +916,10 @@ function checkAvailableCards(battleCardActive) {
    $('#playerCards').children().removeClass("available possible selected topCard removed");
 
    //If 4 was used make wait button visible
-   if (waitTurn == 0) {
+   if(waitTurn && nextTurn == 0){
+    $('#waitTurn').removeClass("invisible");
+   }
+   if (playerWait == 0) {
       $('#waitTurn').addClass("invisible");
       $('#confirmCards').removeClass("invisible");
       $('#resetCards').removeClass("invisible");
@@ -541,29 +928,21 @@ function checkAvailableCards(battleCardActive) {
       $('#confirmCards').addClass("invisible");
       $('#resetCards').addClass("invisible");
    };
-
-   checkCardsToTake();
-
-   //Check if a battle card was used - 2, 3, king of hearts or king of spades
-   function checkCardsToTake() {
-      if (cardsToTake > 1) {
-         battleCardActive = 1;
-      } else {
-         battleCardActive = 0;
-      }
-   }
+   if (waitTurn) $('#waitTurn').removeClass("invisible");
 
    if (selectedCards.length == 0) {
-
+     aceActive = 0;
       //No cards have been chosen
       playerCards.forEach(function (card, i) {
-
          //No special conditions
-         if (card.type == lastCard.type && !jackActive && !waitTurn && !battleCardActive) {
+         if (lastCard == null) {
+           debugger;
+         }
+         if (card.type == lastCard.type && !jackActive && !waitTurn && !playerWait && !battleCardActive) {
             $('#playerCards').find("#" + i).addClass("available");
             availableCards.push(playerCards[i]);
          }
-         if (card.weight == lastCard.weight && !jackActive && !waitTurn && !battleCardActive) {
+         if (card.weight == lastCard.weight && !jackActive && !waitTurn && !playerWait && !battleCardActive) {
             $('#playerCards').find("#" + i).addClass("available");
             availableCards.push(playerCards[i]);
          }
@@ -575,7 +954,7 @@ function checkAvailableCards(battleCardActive) {
          }
 
          //Make jack available if it was used
-         if (card.type == 'jack' && jackActive && !waitTurn && !battleCardActive) {
+         if (card.type == 'jack' && jackActive && !waitTurn && !battleCardActive && lastCard.type == 'jack') {
             $('#playerCards').find("#" + i).addClass("available");
             availableCards.push(playerCards[i]);
          }
@@ -587,7 +966,7 @@ function checkAvailableCards(battleCardActive) {
          }
 
          //Battle card is active - the same cardtype available + 2, 3, kings of given weight
-         if (!jackActive && !waitTurn && battleCardActive) {
+         if (!jackActive && !waitTurn && !playerWait && battleCardActive) {
 
             //Card of same type is available
             if (card.type == lastCard.type ||
@@ -606,8 +985,8 @@ function checkAvailableCards(battleCardActive) {
          };
       });
    } else if (selectedCards.length > 0) {
-      var chosenCard = selectedCards[0];
-      var topCard = selectedCards[selectedCards.length - 1];
+      let chosenCard = selectedCards[0];
+      let topCard = selectedCards[selectedCards.length - 1];
 
       //Style top card
       playerCards.forEach(function (card, i) {
@@ -633,12 +1012,12 @@ function checkAvailableCards(battleCardActive) {
          }
 
          //Make jack possible if it was used
-         if (card.type == 'jack' && jackActive && !waitTurn) {
+         if (card.type == 'jack' && jackActive && !waitTurn && !playerWait) {
             $('#playerCards').find("#" + i).addClass("possible");
             availableCards.push(playerCards[i]);
          }
          //Make 4 possible if it was used
-         if (card.type == "4" && !jackActive && waitTurn) {
+         if (card.type == "4" && !jackActive && waitTurn && !playerWait) {
             $('#playerCards').find("#" + i).addClass("available");
             availableCards.push(playerCards[i]);
          }
