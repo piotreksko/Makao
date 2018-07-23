@@ -439,9 +439,11 @@ function cpuMove() {
            let notCheckedYet = 1;
            switch (card.type) {
               case "2":
+                if(nobodyIsWaiting())
                  cardsToTake += 2;
                  break;
               case "3":
+                 if(nobodyIsWaiting())
                  cardsToTake += 3;
                  break;
               case "4":
@@ -453,8 +455,8 @@ function cpuMove() {
                   chosenType = (neutralCards.reduce((prev, curr) => prev.sameTypeAmount < curr.sameTypeAmount ? prev : curr)).type;
                   console.log("chosenType");
                   console.log(chosenType);
-                  break;
                 };
+                break;
               case "ace":
                 if (notCheckedYet) {
                 aceActive = 1;
@@ -464,10 +466,10 @@ function cpuMove() {
                 chosenWeight = (cpuCardsWithoutMostMoves.reduce((prev, curr) => prev.sameWeightAmount < curr.sameWeightAmount ? prev : curr)).weight;
                 console.log("chosenWeight");
                 console.log(chosenWeight);
-              }
                 break;
+              }
               case "king":
-                 if (card.weight === "hearts" || card.weight === "spades") {
+                 if (card.weight === "hearts" || card.weight === "spades" && nobodyIsWaiting()) {
                     cardsToTake += 5;
                     break;
                  }
@@ -516,7 +518,7 @@ function cpuNoCardsToUse () {
         //Shuffle the deck if there are not enough cards remaining in the deck
         if (cardsToTake > deck.length) {
            let cardsForShuffle = pile;
-           cardForShuffle.pop;
+           cardsForShuffle.pop;
            shuffleDeck(cardsForShuffle);
            deck = deck.concat(cardsForShuffle);
            pile.splice(0, deck.length - 2);
@@ -532,7 +534,7 @@ function cpuNoCardsToUse () {
      else {
        if (deck.length === 1) {
           let cardsForShuffle = pile;
-          cardForShuffle.pop;
+          cardsForShuffle.pop;
           shuffleDeck(cardsForShuffle);
           deck = deck.concat(cardsForShuffle);
           pile.splice(0, deck.length - 2);
@@ -595,27 +597,26 @@ function renderPile() {
 //Confirm cards
 $("#confirmCards").click(function () {
 
-  if (!selectedCards) {
+  //Do nothing if player did not pick cards
+  if (!selectedCards.length) {
     return;
   }
 
-   //Decrease jack counter
-   if (jackActive) {
-      jackActive -= 1;
-   }
-
    //Battle cards - add cards to take accordingly
-   selectedCards.forEach(function (e, index) {
-      switch (e.type) {
+   selectedCards.forEach(function (card) {
+      switch (card.type) {
          case "2":
+            if (nobodyIsWaiting())
             cardsToTake += 2;
             break;
          case "3":
+            if (nobodyIsWaiting())
             cardsToTake += 3;
             break;
          case "4":
             if (!cpuWait) {
             waitTurn += 1;
+            debugger;
           }
             break;
           case "jack":
@@ -626,7 +627,7 @@ $("#confirmCards").click(function () {
             aceActive = 1;
             break;
          case "king":
-            if (e.weight === "hearts" || e.weight === "spades") {
+            if (card.weight === "hearts" || card.weight === "spades" && nobodyIsWaiting()) {
                cardsToTake += 5;
                break;
             }
@@ -639,8 +640,8 @@ $("#confirmCards").click(function () {
       }
 
       //Remove cards from playerCards
-      var index = playerCards.indexOf(e);
-      playerCards.splice(index, 1);
+      var cardIndexInPlayerCards = playerCards.indexOf(card);
+      playerCards.splice(cardIndexInPlayerCards, 1);
    });
 
    pile = pile.concat(selectedCards);
@@ -660,6 +661,14 @@ $("#confirmCards").click(function () {
 
    if(!aceActive && !jackActive){
       renderCards();
+   }
+   //Decrease jack counter
+   if (jackActive) {
+      jackActive -= 1;
+   }
+
+   if (jackActive && lastCard.type !== 'jack'){
+     renderCards();
    }
 });
 
@@ -851,12 +860,12 @@ const pickCard = function pickCard(card) {
    const cardId = $(card).attr('id');
 
    //Check if clicked card is available
-   availableCards.forEach(function (availableCard) {
+   availableCards.forEach((availableCard) => {
 
       if (availableCard.type == playerCards[cardId].type && availableCard.weight == playerCards[cardId].weight) {
-
+        debugger;
          //Card has not been selected yet
-         if (!selectedCards) {
+         if (!selectedCards.length) {
             selectedCards.push(playerCards[cardId]);
          }
          //Available card is chosen
@@ -899,6 +908,10 @@ function checkCardsToTake() {
    }
 }
 
+function nobodyIsWaiting () {
+  return !cpuWait && !playerWait;
+}
+
 function checkAvailableCards() {
 
    $("#newWeight").fadeOut(100);
@@ -911,6 +924,14 @@ function checkAvailableCards() {
    }
 
    availableCards = []; //Clear available cards
+
+   if (lastCard.type == 'ace') {
+      const lastCardAfterAce = {
+        type: 'ace',
+        weight: chosenWeight
+      }
+      lastCard = Object.assign({}, lastCardAfterAce);
+   }
 
    //Clear classes
    $('#playerCards').children().removeClass("available possible selected topCard removed");
@@ -936,7 +957,6 @@ function checkAvailableCards() {
       playerCards.forEach(function (card, i) {
          //No special conditions
          if (lastCard == null) {
-           debugger;
          }
          if (card.type == lastCard.type && !jackActive && !waitTurn && !playerWait && !battleCardActive) {
             $('#playerCards').find("#" + i).addClass("available");
