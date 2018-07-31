@@ -55,6 +55,9 @@ body {
 .buttons {
 	text-align: center;
 }
+button {
+    overflow: auto;
+}
 .topCard {
 	-webkit-transition: all 0.5s;
 	-moz-transition: all 0.5s;
@@ -82,39 +85,40 @@ body {
 	z-index: 999;
 }
 .suit-popup {
-	opacity: 0.5;
-	min-width: 300px;
-	display: none;
-	background: #333;
-	padding: 10px;
-	border: 2px solid #ddd;
-	float: left;
-	font-size: 1.2em;
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	z-index: 99999;
-	box-shadow: 0px 0px 20px #999;
-	-moz-box-shadow: 0px 0px 20px #999;
-	-webkit-box-shadow: 0px 0px 20px #999;
-	border-radius: 3px 3px 3px 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	span {
-		color: #999;
-		font-size: 15px;
-		line-height: 18px;
-		display: block;
-		text-align: center;
-		padding-bottom: 10px;
-	}
+    opacity: 0.5;
+    min-width: 300px;
+    display: none;
+    background: #333;
+    padding: 10px;
+    border: 2px solid #ddd;
+    float: left;
+    font-size: 1.2em;
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    z-index: 99999;
+    box-shadow: 0px 0px 20px #999;
+    -moz-box-shadow: 0px 0px 20px #999;
+    -webkit-box-shadow: 0px 0px 20px #999;
+    border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    overflow: hidden;
+    span {
+        color: #999;
+        font-size: 15px;
+        line-height: 18px;
+        display: block;
+        text-align: center;
+        padding-bottom: 10px;
+    }
 }
 fieldset {
 	border: none;
 }
 .suit-icon {
-	width: 100px;
-	height: 100px;
+	width: 40px;
+	height: 40px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	border-radius: 5px;
@@ -126,8 +130,8 @@ fieldset {
 	}
 }
 .icon-image {
-	width: 80px;
-	height: 80px;
+	width: 30px;
+	height: 30px;
 	text-align: center;
 }
 .newWeight {
@@ -150,4 +154,79 @@ fieldset {
 .cardsInHand {
 	margin-left: -95px;
 	border: solid white 40px;
+}
+
+.wrapper {
+    display: flex;
+    flex-flow: row wrap;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+}
+
+.wrapper > * {
+    padding: 10px;
+    flex: 1 100%;
+}
+
+.header {
+    background-color: #333;
+}
+
+#rules {
+    background: url(https://cdn.iconscout.com/public/images/icon/premium/png-512/prescription-notes-rules-checklist-todo-tasks-39940c544bd69358-512x512.png);
+    background-size: 20px 20px;
+    width: 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 15px;
+}
+
+#reset {
+    background: url(https://cdn4.iconfinder.com/data/icons/game-general-icon-set-1/512/reset-512.png);
+    background-size: 20px 20px;
+    width: 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 15px;
+}
+
+.message {
+    background-color: #707070;
+}
+
+.wait-battle-counter {
+    background-color: #333;
+}
+
+.cards-counter {
+    background-color: #333;
+}
+
+@media all and (min-width: 600px) {
+    .cards-counter {
+        flex: 1 auto;
+    }
+}
+
+@media all and (min-width: 800px) {
+    .pile-counter {
+        flex: 1 0px;
+    }
+
+    .deck-counter {
+        order: 1;
+    }
+
+    .pile-counter {
+        order: 2;
+    }
+
+    .wait-battle-counter {
+        order: 3;
+    }
+
+    .message {
+        order: 4;
+    }
 }

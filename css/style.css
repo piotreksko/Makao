@@ -17,6 +17,17 @@ body {
   transition: 0.1s ease-in-out;
 }
 
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.cards {
+    min-height: 170px
+}
 .available {
   -webkit-box-shadow: 0px 0px 3px 3px rgba(204, 255, 51, 0.9);
   -moz-box-shadow: 0px 0px 3px 3px rgba(204, 255, 51, 0.9);
@@ -52,6 +63,12 @@ body {
 .flex-container {
   display: flex;
   justify-content: center;
+  align-items: center;
+}
+
+.suit-pick {
+  justify-content: center;
+  align-items: center;
 }
 
 #deck {
@@ -63,6 +80,9 @@ body {
   text-align: center;
 }
 
+button {
+  overflow:auto;
+}
 .topCard {
   -webkit-transition: all 0.5s;
   -moz-transition: all 0.5s;
@@ -92,6 +112,7 @@ body {
 }
 
 .suit-popup {
+  overflow: hidden;
   min-width: 300px;
   display: none;
   background: #333;
@@ -100,7 +121,7 @@ body {
   float: left;
   font-size: 1.2em;
   position: fixed;
-  top: 50%;
+  top: 30%;
   left: 50%;
   z-index: 99999;
   box-shadow: 0px 0px 20px #999;
@@ -124,8 +145,8 @@ fieldset {
 }
 
 .suit-icon {
-  width: 100px;
-  height: 100px;
+  width: 40px;
+  height: 40px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
@@ -138,8 +159,8 @@ fieldset {
 }
 
 .icon-image {
-  width: 80px;
-  height: 80px;
+  width: 30px;
+  height: 30px;
   text-align: center;
 }
 
