@@ -81,17 +81,23 @@ button {
 	z-index: 10;
 	width: 100%;
 	height: 100%;
-	opacity: 0.6;
+	opacity: 0.3;
 	z-index: 999;
 }
+.center {
+    text-align: center;
+    vertical-align: middle;
+}
+.win-box {
+    top: 50% !important;
+}
 .suit-popup {
-    opacity: 0.5;
+    opacity: .98;
     min-width: 300px;
     display: none;
     background: #333;
     padding: 10px;
     border: 2px solid #ddd;
-    float: left;
     font-size: 1.2em;
     position: fixed;
     top: 30%;
@@ -104,8 +110,8 @@ button {
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     overflow: hidden;
-    span {
-        color: #999;
+    span, h2, h4 {
+        color: #fff;
         font-size: 15px;
         line-height: 18px;
         display: block;
@@ -125,9 +131,14 @@ fieldset {
 	border: 1px solid #333;
 	background-color: white;
 	cursor: pointer;
+    padding: 0;
+    margin: 10px 0;
 	&:hover {
 		background-color: #F7F7F7;
 	}
+}
+.demand-icons {
+    margin: 0 15px;
 }
 .icon-image {
 	width: 30px;
@@ -155,7 +166,9 @@ fieldset {
 	margin-left: -95px;
 	border: solid white 40px;
 }
-
+.cards-container{
+    min-height:170px;
+}
 .wrapper {
     display: flex;
     flex-flow: row wrap;
@@ -190,7 +203,14 @@ fieldset {
     background-position: center;
     padding: 15px;
 }
-
+#confetti {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+}
 .message {
     background-color: #707070;
 }

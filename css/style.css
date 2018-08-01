@@ -17,6 +17,19 @@ body {
   transition: 0.1s ease-in-out;
 }
 
+#confetti {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.cards {
+  min-height: 170px
+}
+#confetti {
     position: absolute;
     top: 0;
     left: 0;
@@ -188,4 +201,63 @@ fieldset {
 .cardsInHand {
   margin-left: -95px;
   border: solid white 40px;
+}
+
+.wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  font-weight: bold;
+  text-align: center;
+  color: #fff;
+}
+
+.wrapper > * {
+  padding: 10px;
+  flex: 1 100%;
+}
+
+.header {
+  background-color: #333;
+}
+
+#rules {
+    background:url(https://cdn.iconscout.com/public/images/icon/premium/png-512/prescription-notes-rules-checklist-todo-tasks-39940c544bd69358-512x512.png);
+    background-size: 20px 20px;
+    width: 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding:15px;
+}
+
+#reset {
+    background:url(https://cdn4.iconfinder.com/data/icons/game-general-icon-set-1/512/reset-512.png);
+    background-size: 20px 20px;
+    width: 20px;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding:15px;
+}
+
+.message {
+  background-color: #707070;
+}
+
+.wait-battle-counter {
+  background-color: #333;
+}
+
+.cards-counter {
+  background-color: #333;
+}
+
+@media all and (min-width: 600px) {
+  .cards-counter { flex: 1 auto; }
+}
+
+@media all and (min-width: 800px) {
+  .pile-counter    { flex: 1 0px; }
+  .deck-counter { order: 1; }
+  .pile-counter   { order: 2; }
+  .wait-battle-counter { order: 3; }
+  .message  { order: 4; }
 }

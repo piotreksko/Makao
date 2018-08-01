@@ -21,9 +21,14 @@ let playerCards = [],
 let cardTypes = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"];
 let cardWeights = ["clubs", "diamonds", "spades", "hearts"];
 
+
+initGame();
+
 //Init game
-getDeck();
-renderCards();
+function initGame() {
+    getDeck();
+    renderCards();
+};
 
 function getDeck() {
     function card(type, weight) {
@@ -781,64 +786,65 @@ function removeMask() {
 //Ace or jack was chosen
 $("#hearts").click(function () {
     chosenWeight = "hearts";
-    removeMask();
-    renderCards();
+    removeAndRender();
 });
 $("#diamonds").click(function () {
     chosenWeight = "diamonds";
-    removeMask();
-    renderCards();
+    removeAndRender();
 });
 $("#clubs").click(function () {
     chosenWeight = "clubs";
-    removeMask();
-    renderCards();
+    removeAndRender();
 });
 $("#spades").click(function () {
     chosenWeight = "spades";
-    removeMask();
-    renderCards();
+    removeAndRender();
 });
 $("#demand5").click(function () {
     chosenType = "5";
-    removeMask();
-    renderCards();
+    removeAndRender();
 });
 $("#demand6").click(function () {
     chosenType = "6";
-    removeMask();
-    renderCards();
+    removeAndRender();
 });
 $("#demand7").click(function () {
     chosenType = "7";
-    removeMask();
-    renderCards();
+    removeAndRender();
 });
 $("#demand8").click(function () {
     chosenType = "8";
-    removeMask();
-    renderCards();
+    removeAndRender();
 });
 $("#demand9").click(function () {
     chosenType = "9";
-    removeMask();
-    renderCards();
+    removeAndRender();
 });
 $("#demand10").click(function () {
     chosenType = "10";
-    removeMask();
-    renderCards();
+    removeAndRender();
 });
 $("#demandQ").click(function () {
     chosenType = "queen";
-    removeMask();
-    renderCards();
+    removeAndRender();
 });
 $("#demandNone").click(function () {
     jackActive = 0;
+    removeAndRender();
+});
+
+function removeAndRender() {
     removeMask();
     renderCards();
-});
+}
+
+function restartGame() {
+    $('#mask , .suit-popup').fadeOut(300, function () {
+        $('#mask').remove();
+    });
+    updateCardsCounter();
+    initGame();
+}
 
 function openBox(boxType) {
     // Getting the variable
@@ -916,11 +922,33 @@ function checkCardsToTake() {
 function checkWin() {
     if (!cpuCards.length) {
         winner = true;
+        openWinnerBox('cpu');
     }
     if (!playerCards.length) {
         throwConfetti();
         winner = true;
+        openWinnerBox('player');
     }
+}
+
+function openWinnerBox(winner) {
+    // Getting the variable
+    let box;
+    winner === 'player' ? box = $('#player-win-box') : box = $('#cpu-win-box');
+
+    //Fade in the Popup and add close button
+    $(box).fadeIn(300);
+
+    //Set the center alignment padding + border
+    let popMargTop = ($(box).height() + 24) / 2;
+    let popMargLeft = ($(box).width() + 24) / 2;
+
+    $(box).css({
+        'margin-top': -popMargTop,
+        'margin-left': -popMargLeft
+    });
+
+    addMask();
 }
 
 function nobodyIsWaiting() {
