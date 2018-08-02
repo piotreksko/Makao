@@ -17,18 +17,46 @@ let playerCards = [],
     playerWait = 0,
     battleCardActive = 0,
     changeDemand = 0,
-    winner = 0;
-let cardTypes = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"];
-let cardWeights = ["clubs", "diamonds", "spades", "hearts"];
+    winner = 0,
+    totalMoves = -1,
+    cpuWinCounter = 0;
+    playerWinCounter = 0;
+const cardTypes = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"];
+const cardWeights = ["clubs", "diamonds", "spades", "hearts"];
 
 
 initGame();
 
 //Init game
 function initGame() {
+    clearAllVariables;
     getDeck();
     renderCards();
 };
+
+function clearAllVariables() {
+    playerCards = [],
+        cpuCards = [],
+        deck = [],
+        pile = [],
+        nextTurn = 0,
+        availableCards = [],
+        possibleCards = [],
+        selectedCards = [],
+        lastCard = 0,
+        chosenWeight = 0,
+        chosenType = 0,
+        jackActive = 0,
+        aceActive = 0,
+        cardsToTake = 1,
+        waitTurn = 0,
+        cpuWait = 0,
+        playerWait = 0,
+        battleCardActive = 0,
+        changeDemand = 0,
+        winner = 0,
+        totalMoves = -1;
+}
 
 function getDeck() {
     function card(type, weight) {
@@ -116,6 +144,7 @@ function sortCards(array) {
 }
 
 function renderCards() {
+    totalMoves += 1;
     renderPile();
     checkCardsToTake();
     renderPlayerCards();
@@ -123,6 +152,7 @@ function renderCards() {
     if (!winner) {
         cpuMove();
     }
+    checkWin();
     renderPile();
     renderCpuCards();
     updateCardsCounter();
@@ -134,21 +164,25 @@ function renderCards() {
 function updateCardsCounter() {
     $('#deckCounter').empty();
     $('#pileCounter').empty();
-    document.getElementById('deckCounter').innerHTML += 'Cards left on pile: ' + deck.length;
-    document.getElementById('pileCounter').innerHTML += 'Cards on pile: ' + pile.length;
-
-    while ($("#info div").length > 5) {
-        $("#info").children().last().remove();
+    //document.getElementById('deckCounter').innerHTML += 'Cards left on pile: ' + deck.length;
+    //document.getElementById('pileCounter').innerHTML += 'Cards on pile: ' + pile.length;
+    while ($(".message").children().length > 1) {
+        $(".message").children().last().remove();
+        $(".message").fadeOut(200);
     }
     let realCardsToTake = cardsToTake - 1;
     let turnsToWait;
     cpuWait > 1 || playerWait > 1 ? turnsToWait = "turns" : turnsToWait = "turn";
-    cardsToTake > 1 ? $('#info').append(`<div class="message">Current number of cards to take is ${realCardsToTake}</div>`) : null;
-    waitTurn ? $('#info').append(`<div class="message">Current number of turns to wait is ${waitTurn} </div>`) : null;
-    cpuWait ? $('#info').append(`<div class="message">CPU has to wait ${cpuWait} ${turnsToWait}</div>`) : null;
-    playerWait ? $('#info').append(`<div class="message">You have to wait ${playerWait} ${turnsToWait}</div>`) : null;
-    jackActive ? $('#info').append(`<div class="message">Demanded card is ${chosenType}</div>`) : null;
-    lastCard.type == "Ace" ? $('#info').append(`<div class="message">CPU changed color to ${chosenWeight}</div>`) : null;
+    cardsToTake > 1 ? $('.message').append(`<span>Current number of cards to take is ${realCardsToTake}</span>`) : null;
+    waitTurn ? $('.message').append(`<span>Current number of turns to wait is ${waitTurn} </span>`) : null;
+    cpuWait ? $('.message').append(`<span>CPU has to wait ${cpuWait} ${turnsToWait}</span>`) : null;
+    playerWait ? $('.message').append(`<span>You have to wait ${playerWait} ${turnsToWait}</span>`) : null;
+    jackActive ? $('.message').append(`<span>Demanded card is ${chosenType}</span>`) : null;
+    lastCard.type == "Ace" ? $('.message').append(`<span>CPU changed color to ${chosenWeight}</span>`) : null;
+    debugger;
+    $(".message").children().length > 1 ? $(".message").animate({ fontSize: '18px' }, 200).animate({ fontSize: '16px' }, 200).css("display", "inline-block") : null;
+    $(".move-count").children().last().remove();
+    $(".move-count").append(`<span>${totalMoves}</span>`)
 }
 
 //CPU move
@@ -533,7 +567,6 @@ function cpuMove() {
         cpuNoCardsToUse();
     }
     nextTurn = 0;
-    renderCards();
 }
 
 function cpuNoCardsToUse() {
@@ -613,7 +646,7 @@ $('#cpuCards').append(cardDiv);
 function renderCpuCards() {
     $('#cpuCards').empty();
     cpuCards.forEach(function (card, i) {
-        const url = 'https://i.pinimg.com/originals/6c/a0/16/6ca016115a894f69dea75cc80f95ad92.jpg';
+        const url = 'https://bfa.github.io/solitaire-js/img/card_back_bg.png';
         const cardDiv = "<div " + "id='" + i + "' class='card cardsInHand" + "'style='background-image: url(" + url + ");" + ");'></div>";
         $('#cpuCards').append(cardDiv);
     });
@@ -935,6 +968,18 @@ function openWinnerBox(winner) {
     // Getting the variable
     let box;
     winner === 'player' ? box = $('#player-win-box') : box = $('#cpu-win-box');
+    if (winner === 'player') {
+        box = $('#player-win-box');
+        playerWinCounter += 1;
+        document.getElementById("player-win-counter").textContent = playerWinCounter;
+        $("#player-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+    }
+    else {
+        box = $('#cpu-win-box');
+        cpuWinCounter += 1;
+        document.getElementById("cpu-win-counter").textContent = cpuWinCounter;
+        $("#cpu-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+    }
 
     //Fade in the Popup and add close button
     $(box).fadeIn(300);
@@ -1118,7 +1163,7 @@ function throwConfetti() {
 
     var COLORS, Confetti, NUM_CONFETTI, PI_2, canvas, confetti, context, drawCircle, drawCircle2, drawCircle3, i, range, xpos;
 
-    NUM_CONFETTI = 60;
+    NUM_CONFETTI = 50;
 
     COLORS = [[255, 255, 255], [255, 144, 0], [255, 255, 255], [255, 144, 0], [0, 277, 235]];
 

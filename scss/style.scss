@@ -8,6 +8,40 @@ body {
 	-o-background-size: cover;
 	background-size: cover;
 }
+.score {
+    margin-right: 10px;
+}
+
+#score {
+    position: relative;
+    background: rgba(0, 0, 0, 0.15);
+    margin: 1.5em 20% .5em 20%;
+    padding: 1em;
+    line-height: 1;
+    color: #fff;
+    font-size: 14px;
+
+    label {
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+
+    > * {
+        display: inline-block;
+        min-width: 100px;
+
+        &:last-child, &:nth-last-child(2) {
+            float: right;
+            text-align: right;
+        }
+    }
+
+    .message {
+        margin-left: 20px;
+        display: none;
+    }
+}
+
 .card {
 	height: 170px;
 	width: 120px;
@@ -49,8 +83,8 @@ body {
 	justify-content: center;
 }
 #deck {
-	margin-right: 1%;
-	background-image: url("https://i.pinimg.com/originals/6c/a0/16/6ca016115a894f69dea75cc80f95ad92.jpg");
+    margin-right: 1%;
+    background-image: url("https://bfa.github.io/solitaire-js/img/card_back_bg.png");
 }
 .buttons {
 	text-align: center;
@@ -169,30 +203,13 @@ fieldset {
 .cards-container{
     min-height:170px;
 }
-.wrapper {
-    display: flex;
-    flex-flow: row wrap;
-    font-weight: bold;
-    text-align: center;
-    color: #fff;
-}
-
-.wrapper > * {
-    padding: 10px;
-    flex: 1 100%;
-}
-
-.header {
-    background-color: #333;
-}
-
 #rules {
     background: url(https://cdn.iconscout.com/public/images/icon/premium/png-512/prescription-notes-rules-checklist-todo-tasks-39940c544bd69358-512x512.png);
     background-size: 20px 20px;
     width: 20px;
     background-repeat: no-repeat;
     background-position: center;
-    padding: 15px;
+    height: 20px;
 }
 
 #reset {
@@ -201,7 +218,7 @@ fieldset {
     width: 20px;
     background-repeat: no-repeat;
     background-position: center;
-    padding: 15px;
+    height: 20px;
 }
 #confetti {
     position: absolute;
@@ -211,9 +228,6 @@ fieldset {
     pointer-events: none;
     opacity: 0;
 }
-.message {
-    background-color: #707070;
-}
 
 .wait-battle-counter {
     background-color: #333;
@@ -221,32 +235,4 @@ fieldset {
 
 .cards-counter {
     background-color: #333;
-}
-
-@media all and (min-width: 600px) {
-    .cards-counter {
-        flex: 1 auto;
-    }
-}
-
-@media all and (min-width: 800px) {
-    .pile-counter {
-        flex: 1 0px;
-    }
-
-    .deck-counter {
-        order: 1;
-    }
-
-    .pile-counter {
-        order: 2;
-    }
-
-    .wait-battle-counter {
-        order: 3;
-    }
-
-    .message {
-        order: 4;
-    }
 }

@@ -28,13 +28,24 @@
   </head>
 
   <body>
-      <div class="wrapper" id="info">
-          <div class="header">
-              <div id="reset"></div>
-              <div id="rules"></div>
+      <div id="score">
+          <!--<div id="reset"></div>
+    <div id="rules"></div>-->
+          <div class="move-count" data-moves="0">
+              <label>Total moves:</label>
+              <span>0</span>
           </div>
-          <div id="deckCounter" class="cards-counter">Cards left on deck</div>
-          <div id="pileCounter" class="cards-counter">Cards on pile</div>
+          <div class="message">
+              <label>Message:</label>
+          </div>
+          <div class="score" data-score="0">
+              <label>Computer score:</label>
+              <span id="cpu-win-counter">0</span>
+          </div>
+          <div class="score" data-score="0">
+              <label>Your score:</label>
+              <span id="player-win-counter">0</span>
+          </div>
       </div>
       <canvas id="confetti"></canvas>
       <div id="ace-box" class="suit-popup flex-container">
@@ -64,7 +75,7 @@
       <div id="player-win-box" class="center suit-popup win-box">
           <h2 style="color: green">Victory</h2>
           <h4 style="color: white">You have won</h4>
-          <button id="restart" onClick="initGame()" class="suit-icon"><img class="icon-image" src="https://cdn4.iconfinder.com/data/icons/game-general-icon-set-1/512/reset-512.png"></button>
+          <button id="restart" onClick="restartGame()" class="suit-icon"><img class="icon-image" src="https://cdn4.iconfinder.com/data/icons/game-general-icon-set-1/512/reset-512.png"></button>
           <h5 style="color: white">Play again</h5>
       </div>
       <div id="cpu-win-box" class="center suit-popup win-box">
@@ -80,7 +91,7 @@
           <div id="pile"> </div>
       </div>
       <br>
-      <div class="flex-container cards-container"" id="playerContainer"><div class="row cards" id="playerCards"></div></div>
+      <div class="flex-container cards-container" id="playerContainer"><div class="row cards" id="playerCards"></div></div>
       <div id="topCard"> </div>
       <div class="buttons">
           <button id="confirmCards" class="btn btn-success" data-toggle="confirmation" data-singleton="true">Confirm cards</button>
