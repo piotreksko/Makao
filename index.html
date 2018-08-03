@@ -30,7 +30,7 @@
   <body>
       <div id="score">
           <!--<div id="reset"></div>
-    <div id="rules"></div>-->
+        <div id="rules"></div>-->
           <div class="move-count" data-moves="0">
               <label>Total moves:</label>
               <span>0</span>
@@ -48,13 +48,13 @@
           </div>
       </div>
       <canvas id="confetti"></canvas>
-      <div id="ace-box" class="suit-popup flex-container">
+      <div id="ace-box" class="suit-popup flex-container" style="text-align: center;">
           <span>Pick card suit</span>
-          <div class="row suit-pick">
+          <div class="suit-pick">
               <button id="hearts" class="suit-icon"><img class="icon-image" src="https://upload.wikimedia.org/wikipedia/commons/7/77/Heart_symbol_c00.png"></button>
               <button id="diamonds" class="suit-icon"><img class="icon-image" src="https://www.spreadshirt.com/image-server/v1/designs/11631716,width=178,height=178/card-suit-diamond.png"></button>
           </div>
-          <div class="row suit-pick">
+          <div class="suit-pick">
               <button id="clubs" class="suit-icon"><img class="icon-image" src="http://www.clker.com/cliparts/U/3/0/g/Z/y/carte-de-trefla-md.png"></button>
               <button id="spades" class="suit-icon"><img class="icon-image" src="https://image.freepik.com/free-icon/spades-symbol_318-40683.jpg"></button>
           </div>
@@ -71,6 +71,8 @@
               <button id="demandQ" class="suit-icon">Q</button>
               <button id="demandNone" class="suit-icon">X</button>
           </div>
+      </div>
+      <div id="who-starts" class="center suit-popup" style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
       </div>
       <div id="player-win-box" class="center suit-popup win-box">
           <h2 style="color: green">Victory</h2>

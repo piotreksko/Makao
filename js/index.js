@@ -29,9 +29,9 @@ initGame();
 
 //Init game
 function initGame() {
-    clearAllVariables;
+    clearAllVariables();
     getDeck();
-    renderCards();
+    showWhoStarts();
 };
 
 function clearAllVariables() {
@@ -39,7 +39,7 @@ function clearAllVariables() {
         cpuCards = [],
         deck = [],
         pile = [],
-        nextTurn = 0,
+        nextTurn = Math.round(Math.random() * 1),
         availableCards = [],
         possibleCards = [],
         selectedCards = [],
@@ -56,6 +56,21 @@ function clearAllVariables() {
         changeDemand = 0,
         winner = 0,
         totalMoves = -1;
+}
+
+function showWhoStarts() {
+
+    renderPlayerCards();
+    renderPile();
+    renderCpuCards();
+    const whoStartsWindow = $("#who-starts");
+    while (whoStartsWindow.children().length) {
+        whoStartsWindow.children().last().remove();
+    }
+    nextTurn ? whoStartsWindow.append(`<h4 style="color: white; margin: 10px; padding: 10px">Computer goes first</h4>`) : whoStartsWindow.append(`<h4 style="color: white; margin: 10px; padding: 10px">You go first</h4>`);
+    whoStartsWindow.fadeIn(500);
+    setTimeout(whoStartsWindow.fadeOut(1800), 500);
+    setTimeout(renderCards, 2000);
 }
 
 function getDeck() {
@@ -156,6 +171,7 @@ function renderCards() {
     renderPile();
     renderCpuCards();
     updateCardsCounter();
+    checkCardsToTake();
     if (!winner) {
         checkAvailableCards();
     }
@@ -164,22 +180,21 @@ function renderCards() {
 function updateCardsCounter() {
     $('#deckCounter').empty();
     $('#pileCounter').empty();
-    //document.getElementById('deckCounter').innerHTML += 'Cards left on pile: ' + deck.length;
-    //document.getElementById('pileCounter').innerHTML += 'Cards on pile: ' + pile.length;
+
     while ($(".message").children().length > 1) {
         $(".message").children().last().remove();
         $(".message").fadeOut(200);
     }
     let realCardsToTake = cardsToTake - 1;
     let turnsToWait;
+
     cpuWait > 1 || playerWait > 1 ? turnsToWait = "turns" : turnsToWait = "turn";
-    cardsToTake > 1 ? $('.message').append(`<span>Current number of cards to take is ${realCardsToTake}</span>`) : null;
-    waitTurn ? $('.message').append(`<span>Current number of turns to wait is ${waitTurn} </span>`) : null;
+    cardsToTake > 1 ? $('.message').append(`<span>Cards to take: ${realCardsToTake}</span>`) : null;
+    waitTurn ? $('.message').append(`<span>Turns to wait: ${waitTurn} </span>`) : null;
     cpuWait ? $('.message').append(`<span>CPU has to wait ${cpuWait} ${turnsToWait}</span>`) : null;
     playerWait ? $('.message').append(`<span>You have to wait ${playerWait} ${turnsToWait}</span>`) : null;
-    jackActive ? $('.message').append(`<span>Demanded card is ${chosenType}</span>`) : null;
+    jackActive ? $('.message').append(`<span>Demanded card: ${chosenType}</span>`) : null;
     lastCard.type == "Ace" ? $('.message').append(`<span>CPU changed color to ${chosenWeight}</span>`) : null;
-    debugger;
     $(".message").children().length > 1 ? $(".message").animate({ fontSize: '18px' }, 200).animate({ fontSize: '16px' }, 200).css("display", "inline-block") : null;
     $(".move-count").children().last().remove();
     $(".move-count").append(`<span>${totalMoves}</span>`)
@@ -506,7 +521,7 @@ function cpuMove() {
             else {
                 cpuSelectedCards = cpuCards.filter(e => e.type == mostMoves.type);
             }
-
+            console.log(cpuSelectedCards);
             cpuSelectedCards.forEach((card, idx) => {
                 let notCheckedYet = 1;
                 switch (card.type) {
@@ -527,7 +542,7 @@ function cpuMove() {
                             console.log("chosenType");
                             console.log(chosenType);
                         };
-                        jackActive = 2;
+                        chosenType ? jackActive = 2 : jackActive = 0;
                         break;
                     case "ace":
                         if (notCheckedYet) {
@@ -692,7 +707,7 @@ $("#confirmCards").click(function () {
                 }
                 break;
             case "jack":
-                jackActive = 2;
+                jackActive = 3;
                 changeDemand = 1;
                 break;
             case "ace":
@@ -731,12 +746,13 @@ $("#confirmCards").click(function () {
 
     nextTurn = 1;
 
-    if (!aceActive && !jackActive) {
-        renderCards();
-    }
     //Decrease jack counter
     if (jackActive) {
         jackActive -= 1;
+    }
+
+    if (!aceActive && !jackActive) {
+        renderCards();
     }
 
     if (jackActive && lastCard.type !== 'jack') {
@@ -875,6 +891,7 @@ function restartGame() {
     $('#mask , .suit-popup').fadeOut(300, function () {
         $('#mask').remove();
     });
+    hideConfetti();
     updateCardsCounter();
     initGame();
 }
@@ -945,11 +962,7 @@ const pickCard = function pickCard(card) {
 
 //Check if a battle card was used - 2, 3, king of hearts or king of spades
 function checkCardsToTake() {
-    if (cardsToTake > 1) {
-        battleCardActive = 1;
-    } else {
-        battleCardActive = 0;
-    }
+    cardsToTake > 1 ? battleCardActive = 1 : battleCardActive = 0;
 }
 
 function checkWin() {
@@ -968,6 +981,7 @@ function openWinnerBox(winner) {
     // Getting the variable
     let box;
     winner === 'player' ? box = $('#player-win-box') : box = $('#cpu-win-box');
+
     if (winner === 'player') {
         box = $('#player-win-box');
         playerWinCounter += 1;
@@ -980,7 +994,7 @@ function openWinnerBox(winner) {
         document.getElementById("cpu-win-counter").textContent = cpuWinCounter;
         $("#cpu-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
     }
-
+    winner = 0;
     //Fade in the Popup and add close button
     $(box).fadeIn(300);
 
@@ -1085,7 +1099,7 @@ function checkAvailableCards() {
             }
 
             //If type or weight is the same last card and it does not have .available class and jack is not active
-            if (card.type == lastCard.type || playerCards[idx].weight == lastCard.weight && !battleCardActive) {
+            if (card.type == lastCard.type || playerCards[idx].weight == lastCard.weight && !battleCardActive && !jackActive && (card.type !== chosenCard.type && card.weight !== chosenCard.weight)) {
                 //And is not in availableCards yet
                 possibleCards.push(playerCards[idx]);
             }
@@ -1100,15 +1114,17 @@ function checkAvailableCards() {
             }
         });
     }
+    debugger;
     styleAvailableCards();
     stylePossibleCards();
     styleSelectedCards();
+    styleDeck();
 };
 
 function clearClasses() {
     //Clear classes
     $('#playerCards').children().removeClass("available possible selected topCard removed");
-
+    $('#deck').removeClass("no-cards");
     //If 4 was used make wait button visible
     if (waitTurn && nextTurn == 0) {
         $('#waitTurn').removeClass("invisible");
@@ -1149,6 +1165,12 @@ function styleSelectedCards() {
     })
 };
 
+function styleDeck() {
+    if (!availableCards.length && !possibleCards.length && !selectedCards.length && !playerWait) {
+        $('#deck').addClass("no-cards");
+    }
+}
+
 function addMask() {
     $('body').append('<div id="mask"></div>');
     $('#mask').fadeIn(300);
@@ -1159,11 +1181,9 @@ function addMask() {
 https://codepen.io/gamanox/pen/FkEbH
 */
 function throwConfetti() {
-    console.log('Confetti!');
-
     var COLORS, Confetti, NUM_CONFETTI, PI_2, canvas, confetti, context, drawCircle, drawCircle2, drawCircle3, i, range, xpos;
 
-    NUM_CONFETTI = 50;
+    NUM_CONFETTI = 40;
 
     COLORS = [[255, 255, 255], [255, 144, 0], [255, 255, 255], [255, 144, 0], [0, 277, 235]];
 
@@ -1315,4 +1335,9 @@ function throwConfetti() {
     };
     tick();
 
+}
+
+function hideConfetti() {
+    document.getElementById("confetti").width = 0;
+    document.getElementById("confetti").height = 0;
 }
