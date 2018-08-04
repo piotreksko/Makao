@@ -19,8 +19,10 @@ let playerCards = [],
     changeDemand = 0,
     winner = 0,
     totalMoves = -1,
-    cpuWinCounter = 0;
-    playerWinCounter = 0;
+    cpuWinCounter = 0,
+    gameOver = false;
+playerWinCounter = 0;
+
 const cardTypes = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"];
 const cardWeights = ["clubs", "diamonds", "spades", "hearts"];
 
@@ -35,7 +37,7 @@ function initGame() {
 };
 
 function clearAllVariables() {
-    playerCards = [],
+        playerCards = [],
         cpuCards = [],
         deck = [],
         pile = [],
@@ -55,6 +57,7 @@ function clearAllVariables() {
         battleCardActive = 0,
         changeDemand = 0,
         winner = 0,
+        gameOver = false,
         totalMoves = -1;
 }
 
@@ -68,9 +71,28 @@ function showWhoStarts() {
         whoStartsWindow.children().last().remove();
     }
     nextTurn ? whoStartsWindow.append(`<h4 style="color: white; margin: 10px; padding: 10px">Computer goes first</h4>`) : whoStartsWindow.append(`<h4 style="color: white; margin: 10px; padding: 10px">You go first</h4>`);
-    whoStartsWindow.fadeIn(500);
-    setTimeout(whoStartsWindow.fadeOut(1800), 500);
-    setTimeout(renderCards, 2000);
+    whoStartsWindow.fadeIn(700).fadeOut(1400);
+    setTimeout(renderCards, 1500);
+}
+
+function checkMacao(whoToCheck) {
+
+    const macaoWindow = $("#macao");
+
+    while (macaoWindow.children().length) {
+        macaoWindow.children().last().remove();
+    }
+    if (whoToCheck == "Player" && playerCards.length == 1) {
+        showMacao();
+    }
+    if (whoToCheck == "Computer" && cpuCards.length == 1) {
+        showMacao();
+    }
+
+    function showMacao() {
+        macaoWindow.append(`<h4 style="color: white; margin: 10px; padding: 10px"><4>${whoToCheck}:< /br>Macao</h4>`)
+        macaoWindow.fadeIn(800).fadeOut(900);
+    }
 }
 
 function getDeck() {
@@ -159,15 +181,21 @@ function sortCards(array) {
 }
 
 function renderCards() {
+    checkMacao("Player");
     totalMoves += 1;
     renderPile();
     checkCardsToTake();
     renderPlayerCards();
-    checkWin();
+    if (!gameOver) {
+        checkWin();
+    }
     if (!winner) {
         cpuMove();
     }
-    checkWin();
+    if (!gameOver) {
+        checkWin();
+    }
+    checkMacao("Computer");
     renderPile();
     renderCpuCards();
     updateCardsCounter();
@@ -178,6 +206,7 @@ function renderCards() {
 }
 
 function updateCardsCounter() {
+    updateLastCard();
     $('#deckCounter').empty();
     $('#pileCounter').empty();
 
@@ -195,6 +224,7 @@ function updateCardsCounter() {
     playerWait ? $('.message').append(`<span>You have to wait ${playerWait} ${turnsToWait}</span>`) : null;
     jackActive ? $('.message').append(`<span>Demanded card: ${chosenType}</span>`) : null;
     lastCard.type == "Ace" ? $('.message').append(`<span>CPU changed color to ${chosenWeight}</span>`) : null;
+    lastCard.type == "jack" && !jackActive ? $('.message').append(`<span>No demand</span>`) : null;
     $(".message").children().length > 1 ? $(".message").animate({ fontSize: '18px' }, 200).animate({ fontSize: '16px' }, 200).css("display", "inline-block") : null;
     $(".move-count").children().last().remove();
     $(".move-count").append(`<span>${totalMoves}</span>`)
@@ -269,26 +299,6 @@ function cpuMove() {
         let aces = cpuPossibleMoves.filter((card) => {
             return card.type == "ace";
         });
-
-        // let fours = getFours(cpuPossibleMoves);
-        // let jacks = getJacks(cpuPossibleMoves);
-        // let aces = getAces(cpuPossibleMoves);
-        //
-        //
-        // function getFours (cpuPossibleMoves) {
-        //   return cpuPossibleMoves.filter((card) => {
-        //     return card.type == "4";
-        // })}
-        //
-        // function getJacks (cpuPossibleMoves) {
-        //   return cpuPossibleMoves.filter((card) => {
-        //     return card.type == "jack";
-        // })}
-        //
-        // function getAces (cpuPossibleMoves) {
-        //   return cpuPossibleMoves.filter((card) => {
-        //     return card.type == "ace";
-        // })}
 
         let kings = cpuPossibleMoves.filter((card) => {
             console.log((card.type == "king" && card.weight == "diamonds") || (card.type == "king" && card.weight == "clubs"));
@@ -506,7 +516,6 @@ function cpuMove() {
 
             console.log("cardsToUse");
             console.log(cardsToUse);
-
             let mostMoves = cardsToUse.reduce((prev, curr) => prev.possibleCardsAfter < curr.possibleCardsAfter ? prev : curr);
 
             console.log("mostMoves");
@@ -520,6 +529,20 @@ function cpuMove() {
             }
             else {
                 cpuSelectedCards = cpuCards.filter(e => e.type == mostMoves.type);
+
+                //While the first selected card does not match the card on pile - move it to the end of array
+                if (lastCard.type !== cpuSelectedCards[0].type && lastCard.type !== "Ace" && !jackActive) {
+                    while (cpuSelectedCards[0].weight !== lastCard.weight) {
+                        const firstCard = cpuSelectedCards.shift();
+                        cpuSelectedCards.push(firstCard);
+                    }
+                }
+                if (chosenType !== cpuSelectedCards[0].type && lastCard.type == "Ace" && !jackActive) {
+                    while (cpuSelectedCards[0].weight !== lastCard.weight) {
+                        const firstCard = cpuSelectedCards.shift();
+                        cpuSelectedCards.push(firstCard);
+                    }
+                }
             }
             console.log(cpuSelectedCards);
             cpuSelectedCards.forEach((card, idx) => {
@@ -538,6 +561,7 @@ function cpuMove() {
                         break;
                     case "jack":
                         if (neutralCards.length) {
+                            debugger;
                             chosenType = (neutralCards.reduce((prev, curr) => prev.sameTypeAmount < curr.sameTypeAmount ? prev : curr)).type;
                             console.log("chosenType");
                             console.log(chosenType);
@@ -546,10 +570,8 @@ function cpuMove() {
                         break;
                     case "ace":
                         if (notCheckedYet) {
-                            let cpuCardsWithoutMostMoves = cpuCards;
-                            console.log(cpuCardsWithoutMostMoves);
+                            let cpuCardsWithoutMostMoves = [...cpuCards];
                             cpuCardsWithoutMostMoves.splice(cpuCardsWithoutMostMoves.indexOf(mostMoves), 1);
-                            console.log(cpuCardsWithoutMostMoves);
                             if (cpuCards.length > 1) chosenWeight = (cpuCardsWithoutMostMoves.reduce((prev, curr) => prev.sameWeightAmount < curr.sameWeightAmount ? prev : curr)).weight;
                             console.log("chosenWeight");
                             console.log(chosenWeight);
@@ -571,6 +593,7 @@ function cpuMove() {
                     weight: card.weight,
                     type: card.type
                 };
+
                 let indexInCpuCards = cpuCards.findIndex(x => x.type == card.type && x.weight == card.weight);
                 cpuCards.splice(indexInCpuCards, 1);
                 pile.push(card);
@@ -646,18 +669,18 @@ function renderPlayerCards() {
         $('#playerCards').append(cardDiv);
     });
 };
-/*
-function renderCpuCards() {
-$('#cpuCards').empty();
-cpuCards.forEach(function (card, i) {
-const fileName = card.type + "_of_" + card.weight;
-const url = 'https://res.cloudinary.com/bosmanone/image/upload/v1477397924/cards/' + fileName + '.png';
-const cardDiv = "<div " + "id='" + i + "' class='card " + fileName + " cardsInHand' onclick='pickCard(this)' style='background-image: url(" + url + ");" + ");'></div>";
-$('#cpuCards').append(cardDiv);
-});
-};
-*/
 
+function renderCpuCards() {
+    $('#cpuCards').empty();
+    cpuCards.forEach(function (card, i) {
+        const fileName = card.type + "_of_" + card.weight;
+        const url = 'https://res.cloudinary.com/bosmanone/image/upload/v1477397924/cards/' + fileName + '.png';
+        const cardDiv = "<div " + "id='" + i + "' class='card " + fileName + " cardsInHand' onclick='pickCard(this)' style='background-image: url(" + url + ");" + ");'></div>";
+        $('#cpuCards').append(cardDiv);
+    });
+};
+
+/*
 function renderCpuCards() {
     $('#cpuCards').empty();
     cpuCards.forEach(function (card, i) {
@@ -666,7 +689,7 @@ function renderCpuCards() {
         $('#cpuCards').append(cardDiv);
     });
 };
-
+*/
 
 function renderPile() {
     if (pile.length) {
@@ -682,7 +705,18 @@ function renderPile() {
     }
 };
 
-//Confirm cards
+//Open rules window
+$("#open-rules").click(function () {
+    $('#rules').fadeIn(600);
+});
+
+$("#close-rules").click(function () {
+    $('#rules').fadeOut(600);
+});
+
+$("#open-rules").attr('title', 'Macao rules');
+
+//Confirm selected cards
 $("#confirmCards").click(function () {
 
     //Do nothing if player did not pick cards
@@ -742,7 +776,7 @@ $("#confirmCards").click(function () {
         openBox('jack');
     };
     selectedCards = [];
-    lastCard = pile[pile.length - 1];
+    updateLastCard();
 
     nextTurn = 1;
 
@@ -759,6 +793,10 @@ $("#confirmCards").click(function () {
         renderCards();
     }
 });
+
+function updateLastCard() {
+    lastCard = pile[pile.length - 1];
+}
 
 //Reset selectedcards
 $("#resetCards").click(function () {
@@ -891,7 +929,7 @@ function restartGame() {
     $('#mask , .suit-popup').fadeOut(300, function () {
         $('#mask').remove();
     });
-    hideConfetti();
+    removeConfetti();
     updateCardsCounter();
     initGame();
 }
@@ -936,7 +974,8 @@ const pickCard = function pickCard(card) {
             }
 
             //Possible card is chosen - possible exists only if a card has been selected
-            else if ($(card).hasClass('possible')) {
+            if ($(card).hasClass('possible')) {
+                debugger;
                 selectedCards = [];
                 selectedCards.push(playerCards[cardId]);
             }
@@ -969,20 +1008,22 @@ function checkWin() {
     if (!cpuCards.length) {
         winner = true;
         openWinnerBox('cpu');
+        $('#waitTurn').addClass("invisible");
     }
     if (!playerCards.length) {
         throwConfetti();
         winner = true;
         openWinnerBox('player');
+        $('#waitTurn').addClass("invisible");
     }
 }
 
-function openWinnerBox(winner) {
+function openWinnerBox(whoWon) {
     // Getting the variable
     let box;
-    winner === 'player' ? box = $('#player-win-box') : box = $('#cpu-win-box');
+    whoWon === 'player' ? box = $('#player-win-box') : box = $('#cpu-win-box');
 
-    if (winner === 'player') {
+    if (whoWon === 'player') {
         box = $('#player-win-box');
         playerWinCounter += 1;
         document.getElementById("player-win-counter").textContent = playerWinCounter;
@@ -994,7 +1035,8 @@ function openWinnerBox(winner) {
         document.getElementById("cpu-win-counter").textContent = cpuWinCounter;
         $("#cpu-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
     }
-    winner = 0;
+    gameOver = true;
+
     //Fade in the Popup and add close button
     $(box).fadeIn(300);
 
@@ -1018,7 +1060,7 @@ function checkAvailableCards() {
 
     availableCards = []; //Clear available cards
     possibleCards = []; //Clear possible cards
-    lastCard = pile[pile.length - 1];
+    updateLastCard();
     if (lastCard.type == 'ace') {
         const lastCardAfterAce = {
             type: 'ace',
@@ -1114,7 +1156,7 @@ function checkAvailableCards() {
             }
         });
     }
-    debugger;
+
     styleAvailableCards();
     stylePossibleCards();
     styleSelectedCards();
@@ -1166,8 +1208,10 @@ function styleSelectedCards() {
 };
 
 function styleDeck() {
-    if (!availableCards.length && !possibleCards.length && !selectedCards.length && !playerWait) {
-        $('#deck').addClass("no-cards");
+    !availableCards.length && !possibleCards.length && !selectedCards.length && !playerWait ? $('#deck').addClass("available") : $('#deck').addClass("no-cards");
+    if (playerWait) {
+        $('#deck').removeClass("no-cards");
+        $('#deck').removeClass("available");
     }
 }
 
@@ -1337,7 +1381,7 @@ function throwConfetti() {
 
 }
 
-function hideConfetti() {
-    document.getElementById("confetti").width = 0;
-    document.getElementById("confetti").height = 0;
+function removeConfetti() {
+    $('#confetti-container').empty();
+    $('#confetti-container').append(`<canvas id="confetti"></canvas>`);
 }

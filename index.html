@@ -1,116 +1,141 @@
 ﻿<!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Makao (WIP)</title>
+    <meta charset="UTF-8">
+    <title>Makao (WIP)</title>
 
 
-  <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.css'>
-
-  <link rel="stylesheet" href="scss/style.css">
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.css'>
+    <link href="https://fonts.googleapis.com/css?family=Almendra:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="scss/style.css">
 
 
 </head>
 
 <body>
 
-  <html lang="en">
+    <html lang="en">
 
-  <head>
-    <meta charset="UTF-8">
-    <title>Makao</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>Makao</title>
 
-    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.css'>
-    <!--<link rel="stylesheet" href="css/style.css">-->
-
-
-  </head>
-
-  <body>
-      <div id="score">
-          <!--<div id="reset"></div>
-        <div id="rules"></div>-->
-          <div class="move-count" data-moves="0">
-              <label>Total moves:</label>
-              <span>0</span>
-          </div>
-          <div class="message">
-              <label>Message:</label>
-          </div>
-          <div class="score" data-score="0">
-              <label>Computer score:</label>
-              <span id="cpu-win-counter">0</span>
-          </div>
-          <div class="score" data-score="0">
-              <label>Your score:</label>
-              <span id="player-win-counter">0</span>
-          </div>
-      </div>
-      <canvas id="confetti"></canvas>
-      <div id="ace-box" class="suit-popup flex-container" style="text-align: center;">
-          <span>Pick card suit</span>
-          <div class="suit-pick">
-              <button id="hearts" class="suit-icon"><img class="icon-image" src="https://upload.wikimedia.org/wikipedia/commons/7/77/Heart_symbol_c00.png"></button>
-              <button id="diamonds" class="suit-icon"><img class="icon-image" src="https://www.spreadshirt.com/image-server/v1/designs/11631716,width=178,height=178/card-suit-diamond.png"></button>
-          </div>
-          <div class="suit-pick">
-              <button id="clubs" class="suit-icon"><img class="icon-image" src="http://www.clker.com/cliparts/U/3/0/g/Z/y/carte-de-trefla-md.png"></button>
-              <button id="spades" class="suit-icon"><img class="icon-image" src="https://image.freepik.com/free-icon/spades-symbol_318-40683.jpg"></button>
-          </div>
-      </div>
-      <div id="jack-box" class="suit-popup flex-container">
-          <span>Pick card</span>
-          <div class="demand-icons">
-              <button id="demand5" class="suit-icon">5</button>
-              <button id="demand6" class="suit-icon">6</button>
-              <button id="demand7" class="suit-icon">7</button>
-              <button id="demand8" class="suit-icon">8</button>
-              <button id="demand9" class="suit-icon">9</button>
-              <button id="demand10" class="suit-icon">10</button>
-              <button id="demandQ" class="suit-icon">Q</button>
-              <button id="demandNone" class="suit-icon">X</button>
-          </div>
-      </div>
-      <div id="who-starts" class="center suit-popup" style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
-      </div>
-      <div id="player-win-box" class="center suit-popup win-box">
-          <h2 style="color: green">Victory</h2>
-          <h4 style="color: white">You have won</h4>
-          <button id="restart" onClick="restartGame()" class="suit-icon"><img class="icon-image" src="https://cdn4.iconfinder.com/data/icons/game-general-icon-set-1/512/reset-512.png"></button>
-          <h5 style="color: white">Play again</h5>
-      </div>
-      <div id="cpu-win-box" class="center suit-popup win-box">
-          <h2 style="color: red">Defeat</h2>
-          <h4 style="color: white">Computer has won</h4>
-          <button id="restart" onClick="restartGame()" class="suit-icon"><img class="icon-image" src="https://cdn4.iconfinder.com/data/icons/game-general-icon-set-1/512/reset-512.png"></button>
-          <h5 style="color: white">Play again</h5>
-      </div>
-      <div class="flex-container cards-container" id="cpuContainer"><div class="row cards" id="cpuCards"></div></div>
-      <br>
-      <div class="flex-container">
-          <div class="card" id="deck"> </div>
-          <div id="pile"> </div>
-      </div>
-      <br>
-      <div class="flex-container cards-container" id="playerContainer"><div class="row cards" id="playerCards"></div></div>
-      <div id="topCard"> </div>
-      <div class="buttons">
-          <button id="confirmCards" class="btn btn-success" data-toggle="confirmation" data-singleton="true">Confirm cards</button>
-          <button id="resetCards" class="btn btn-danger" data-toggle="confirmation" data-singleton="true">Reset chosen cards</button>
-          <button id="waitTurn" class="btn btn-primary invisible" data-toggle="confirmation" data-singleton="true">Wait</button>
-      </div>
-      <div id="noCards"> </div>
-      <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-      <!--<script src="js/index.js"></script>-->
-  </body>
-
-  </html>
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+        <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.css'>
+        <!--<link rel="stylesheet" href="css/style.css">-->
 
 
+    </head>
 
-  <script  src="js/index.js"></script>
+    <body>
+        <div id="score">
+            <button id="open-rules" class="rules-icon"><img class="icon-image" src="https://cdn.iconscout.com/public/images/icon/premium/png-512/prescription-notes-rules-checklist-todo-tasks-39940c544bd69358-512x512.png"></button>
+            <div class="move-count" data-moves="0">
+                <label>Total moves:</label>
+                <span>0</span>
+            </div>
+            <div class="message">
+                <label>Message:</label>
+            </div>
+            <div class="score" data-score="0">
+                <label>Computer score:</label>
+                <span id="cpu-win-counter">0</span>
+            </div>
+            <div class="score" data-score="0">
+                <label>Your score:</label>
+                <span id="player-win-counter">0</span>
+            </div>
+        </div>
+        <div id="confetti-container">
+            <canvas id="confetti"></canvas>
+        </div>
+        <div id="ace-box" class="suit-popup flex-container" style="text-align: center;">
+            <span>Pick card suit</span>
+            <div class="suit-pick">
+                <button id="hearts" class="suit-icon"><img class="icon-image" src="https://upload.wikimedia.org/wikipedia/commons/7/77/Heart_symbol_c00.png"></button>
+                <button id="diamonds" class="suit-icon"><img class="icon-image" src="https://www.spreadshirt.com/image-server/v1/designs/11631716,width=178,height=178/card-suit-diamond.png"></button>
+            </div>
+            <div class="suit-pick">
+                <button id="clubs" class="suit-icon"><img class="icon-image" src="http://www.clker.com/cliparts/U/3/0/g/Z/y/carte-de-trefla-md.png"></button>
+                <button id="spades" class="suit-icon"><img class="icon-image" src="https://image.freepik.com/free-icon/spades-symbol_318-40683.jpg"></button>
+            </div>
+        </div>
+        <div id="jack-box" class="suit-popup flex-container">
+            <span>Pick card</span>
+            <div class="demand-icons">
+                <button id="demand5" class="suit-icon">5</button>
+                <button id="demand6" class="suit-icon">6</button>
+                <button id="demand7" class="suit-icon">7</button>
+                <button id="demand8" class="suit-icon">8</button>
+                <button id="demand9" class="suit-icon">9</button>
+                <button id="demand10" class="suit-icon">10</button>
+                <button id="demandQ" class="suit-icon">Q</button>
+                <button id="demandNone" class="suit-icon">X</button>
+            </div>
+        </div>
+        <div id="rules" class="center suit-popup">
+            <i id="close-rules">x</i>
+            <h1>Gameplay</h1>
+            <p>
+                <span>Players are dealt 5 cards each; the deck is then cut and the cut card becomes the first card in the discard pile. Play starts randomly.</span>
+                <span>The next card played must be of the same suit or the same value as the card on the top of the discard pile. If a 7 of spades was on the top of the discard pile, the player can play a 9 of spades or a 7 of clubs. If the player cannot play a card, he must draw from the deck.</span>
+                <span>Cards can be played in runs, i.e. 5 of Spades, 5 of Diamonds, 5 of Hearts.</span>
+                <span>When an action card is played, the player next in sequence must complete the action or add to it to pass in onto the next player in sequence. When down to a single card, a player must say "Macao!". The winner of the game is the first player to have no cards;</span>
+            </p>
+            <h1>Action cards</h1>
+            <p>
+                <ul>
+                    <li>If a 2 is played, the next player in sequence must pick up 2 cards unless they have a 2, in which case they can add this to the original 2 and the next player in sequence must pick up 4 cards and so on.</li>
+                    <li>If a 3 is played, the next player in sequence must pick up 3 cards unless they have a 3, in which case they can add this to the original 3 and the next player in sequence must pick up 6 cards and so on.</li>
+                    <li>If a 4 is played, the next player in sequence must miss a go, unless they have a 4, in which case they can add this to the original 4 and the next player in sequence miss 2 goes.</li>
+                    <li>If a Jack is played, the player placing the Jack can call for a non-action card value, him and the player in sequence must either play the card value called or place another Jack down and call a different value.</li>
+                    <li>If a King of Spades is played, the previous player in sequence must pick up 5 cards, unless they have a King of Hearts, in which case they can add this to the original King and the next player in sequence must pick up 10 cards.</li>
+                    <li>If a King of Hearts is played, the next player in sequence must pick up 5 cards, unless they have a King of Spades, in which case they can add this to the original King and the next player in sequence must pick up 10 cards.</li>
+                    <li>If a King of Hearts is played or King of Spades is played, the player who must pick up cards can use King of Diamonds or King of Clubs to defend himself and not take any cards.</li>
+                    <li>If an Ace is played, the player playing the Ace can call a suit suit of choice.</li>
+                </ul>
+                <span>Multiples action cards can be played, i.e. Player 1 plays three 2s and the next player in sequence must pick up 6 cards unless they have another 2. This is the same for 3's, 4's and Kings.</span>
+            </p>
+        </div>
+        <div id="who-starts" class="center suit-popup" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>
+        <div id="macao" class="center suit-popup" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>
+        <div id="player-win-box" class="center suit-popup win-box">
+            <h2 style="color: green">Victory</h2>
+            <h4 style="color: white">You have won</h4>
+            <button id="restart" onClick="restartGame()" class="suit-icon"><img class="icon-image" src="https://cdn4.iconfinder.com/data/icons/game-general-icon-set-1/512/reset-512.png"></button>
+            <h5 style="color: white">Play again</h5>
+        </div>
+        <div id="cpu-win-box" class="center suit-popup win-box">
+            <h2 style="color: red">Defeat</h2>
+            <h4 style="color: white">Computer has won</h4>
+            <button id="restart" onClick="restartGame()" class="suit-icon"><img class="icon-image" src="https://cdn4.iconfinder.com/data/icons/game-general-icon-set-1/512/reset-512.png"></button>
+            <h5 style="color: white">Play again</h5>
+        </div>
+        <div class="flex-container cards-container" id="cpuContainer"><div class="row cards" id="cpuCards"></div></div>
+        <br>
+        <div class="flex-container">
+            <div class="card" id="deck"> </div>
+            <div id="pile"> </div>
+        </div>
+        <br>
+        <div class="flex-container cards-container" id="playerContainer"><div class="row cards" id="playerCards"></div></div>
+        <div id="topCard"> </div>
+        <div class="buttons">
+            <button id="confirmCards" class="btn btn-success" data-toggle="confirmation" data-singleton="true">Confirm cards</button>
+            <button id="resetCards" class="btn btn-danger" data-toggle="confirmation" data-singleton="true">Reset chosen cards</button>
+            <button id="waitTurn" class="btn btn-primary invisible" data-toggle="confirmation" data-singleton="true">Wait</button>
+        </div>
+        <div id="noCards"> </div>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+        <!--<script src="js/index.js"></script>-->
+    </body>
+
+</html>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+
+
+
+<script src="js/index.js"></script>
 
 
 

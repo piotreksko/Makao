@@ -11,6 +11,67 @@ body {
 .score {
   margin-right: 10px; }
 
+#rules {
+  font-family: 'Almendra', serif;
+  background-color: #f8f5de;
+  background-image: linear-gradient(to right, rgba(255, 210, 0, 0.4), rgba(200, 160, 0, 0.1) 11%, rgba(0, 0, 0, 0) 35%, rgba(200, 160, 0, 0.1) 65%);
+  opacity: 100;
+  text-align: justify;
+  text-justify: inter-word;
+  font-family: 'Almendra', serif;
+  z-index: 99999;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  max-height: 95%;
+  overflow: auto;
+  max-width: 800px; }
+  #rules h1 {
+    text-align: center;
+    color: rgba(0, 0, 0, 0.8); }
+  #rules p, #rules span, #rules h2, #rules h4, #rules ul {
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.8);
+    display: block;
+    text-align: justify;
+    text-justify: inter-word;
+    padding-bottom: 10px; }
+  #rules p {
+    font-size: 12px; }
+  #rules i {
+    cursor: pointer;
+    display: block;
+    float: right;
+    font-style: normal;
+    font-family: arial, sans-serif;
+    color: #999;
+    background-color: #333;
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin: 5px 6px 10px;
+    line-height: 1.0em; }
+
+/*opacity: .98;
+min-width: 300px;
+display: none;
+background: #333;
+padding: 10px;
+border: 2px solid #ddd;
+font-size: 1.2em;
+position: fixed;
+top: 30%;
+left: 50%;
+transform: translate(-50%, -50%);
+z-index: 99999;
+box-shadow: 0px 0px 20px #999;
+-moz-box-shadow: 0px 0px 20px #999;
+-webkit-box-shadow: 0px 0px 20px #999;
+border-radius: 3px 3px 3px 3px;
+-moz-border-radius: 3px;
+-webkit-border-radius: 3px;
+overflow: hidden;*/
 #score {
   position: relative;
   background: rgba(0, 0, 0, 0.15);
@@ -23,8 +84,7 @@ body {
     font-weight: 700;
     margin-bottom: 0; }
   #score > * {
-    display: inline-block;
-    min-width: 100px; }
+    display: inline-block; }
     #score > *:last-child, #score > *:nth-last-child(2) {
       float: right;
       text-align: right; }
@@ -45,7 +105,7 @@ body {
   box-shadow: 0px 0px 3px 3px rgba(204, 255, 51, 0.9); }
   .available:hover {
     cursor: pointer;
-    -webkit-transform: translate(0px, -20px);
+    -webkit-transform: translate(0px, -15px);
     box-shadow: 0px 0px 5px 1px black;
     -webkit-transition: all 0.3s;
     -moz-transition: all 0.3s;
@@ -57,7 +117,7 @@ body {
   box-shadow: 0px 0px 3px 3px rgba(52, 152, 218, 0.9); }
   .possible:hover {
     cursor: pointer;
-    -webkit-transform: translate(0px, -20px);
+    -webkit-transform: translate(0px, -15px);
     box-shadow: 0px 0px 5px 1px black;
     -webkit-transition: all 0.3s;
     -moz-transition: all 0.3s;
@@ -69,7 +129,7 @@ body {
   box-shadow: 0px 0px 3px 3px rgba(102, 51, 153, 0.9); }
   .no-cards:hover {
     cursor: pointer;
-    -webkit-transform: translate(0px, -10px);
+    -webkit-transform: translate(0px, -5px);
     box-shadow: 0px 0px 5px 1px black;
     -webkit-transition: all 0.3s;
     -moz-transition: all 0.3s;
@@ -135,6 +195,7 @@ button {
   position: fixed;
   top: 30%;
   left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 99999;
   box-shadow: 0px 0px 20px #999;
   -moz-box-shadow: 0px 0px 20px #999;
@@ -168,6 +229,20 @@ fieldset {
   .suit-icon:hover {
     background-color: #F7F7F7; }
 
+.rules-icon {
+  width: 40px !important;
+  height: 40px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  border: 0;
+  background: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  padding: 0;
+  margin: 10px 15px 10px 10px; }
+  .rules-icon:hover {
+    background: rgba(0, 0, 0, 0.3); }
+
 .demand-icons {
   margin: 0 15px; }
 
@@ -199,14 +274,6 @@ fieldset {
 
 .cards-container {
   min-height: 170px; }
-
-#rules {
-  background: url(https://cdn.iconscout.com/public/images/icon/premium/png-512/prescription-notes-rules-checklist-todo-tasks-39940c544bd69358-512x512.png);
-  background-size: 20px 20px;
-  width: 20px;
-  background-repeat: no-repeat;
-  background-position: center;
-  height: 20px; }
 
 #reset {
   background: url(https://cdn4.iconfinder.com/data/icons/game-general-icon-set-1/512/reset-512.png);
