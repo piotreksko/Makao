@@ -669,7 +669,7 @@ function renderPlayerCards() {
         $('#playerCards').append(cardDiv);
     });
 };
-
+/*
 function renderCpuCards() {
     $('#cpuCards').empty();
     cpuCards.forEach(function (card, i) {
@@ -679,8 +679,8 @@ function renderCpuCards() {
         $('#cpuCards').append(cardDiv);
     });
 };
+*/
 
-/*
 function renderCpuCards() {
     $('#cpuCards').empty();
     cpuCards.forEach(function (card, i) {
@@ -689,7 +689,7 @@ function renderCpuCards() {
         $('#cpuCards').append(cardDiv);
     });
 };
-*/
+
 
 function renderPile() {
     if (pile.length) {
