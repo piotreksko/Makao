@@ -12,7 +12,7 @@ body {
     margin-right: 10px;
 }
 
-#rules {
+.rules {
     font-family: 'Almendra', serif;
     background-color: #f8f5de;
     background-image: linear-gradient(to right, rgba(255,210,0,0.4), rgba(200, 160, 0, 0.1) 11%, rgba(0,0,0,0) 35%, rgba(200, 160, 0, 0.1) 65%);
@@ -22,6 +22,7 @@ body {
     font-family: 'Almendra', serif;
     z-index: 99999;
     position: fixed;
+    display: none;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -29,15 +30,17 @@ body {
     max-height: 95%;
     overflow: auto;
     max-width: 800px;
-
+    padding: 10px;
+    border-radius: 10px;
+    min-width:80%;
     h1 {
         text-align: center;
-        color: rgba(0,0,0,0.8);
+        color: rgba(0,0,0,0.9);
     }
 
     p, span, h2, h4, ul {
         font-size: 16px;
-        color: rgba(0,0,0,0.8);
+        color: rgba(0,0,0,0.9);
         display: block;
         text-align: justify;
         text-justify: inter-word;
@@ -47,6 +50,7 @@ body {
     p {
         font-size: 12px;
     }
+
     i {
         cursor: pointer;
         display: block;
@@ -99,7 +103,7 @@ body {
     > * {
         display: inline-block;
 
-        &:last-child, &:nth-last-child(2) {
+        &:last-child, &:nth-last-child(2), &:nth-last-child(3) {
             float: right;
             text-align: right;
         }
@@ -218,7 +222,6 @@ button {
     position: fixed;
     top: 30%;
     left: 50%;
-    transform: translate(-50%, -50%);
     z-index: 99999;
     box-shadow: 0px 0px 20px #999;
     -moz-box-shadow: 0px 0px 20px #999;

@@ -11,7 +11,7 @@ body {
 .score {
   margin-right: 10px; }
 
-#rules {
+.rules {
   font-family: 'Almendra', serif;
   background-color: #f8f5de;
   background-image: linear-gradient(to right, rgba(255, 210, 0, 0.4), rgba(200, 160, 0, 0.1) 11%, rgba(0, 0, 0, 0) 35%, rgba(200, 160, 0, 0.1) 65%);
@@ -21,26 +21,30 @@ body {
   font-family: 'Almendra', serif;
   z-index: 99999;
   position: fixed;
+  display: none;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   object-fit: contain;
   max-height: 95%;
   overflow: auto;
-  max-width: 800px; }
-  #rules h1 {
+  max-width: 800px;
+  padding: 10px;
+  border-radius: 10px;
+  min-width: 80%; }
+  .rules h1 {
     text-align: center;
-    color: rgba(0, 0, 0, 0.8); }
-  #rules p, #rules span, #rules h2, #rules h4, #rules ul {
+    color: rgba(0, 0, 0, 0.9); }
+  .rules p, .rules span, .rules h2, .rules h4, .rules ul {
     font-size: 16px;
-    color: rgba(0, 0, 0, 0.8);
+    color: rgba(0, 0, 0, 0.9);
     display: block;
     text-align: justify;
     text-justify: inter-word;
     padding-bottom: 10px; }
-  #rules p {
+  .rules p {
     font-size: 12px; }
-  #rules i {
+  .rules i {
     cursor: pointer;
     display: block;
     float: right;
@@ -85,7 +89,7 @@ overflow: hidden;*/
     margin-bottom: 0; }
   #score > * {
     display: inline-block; }
-    #score > *:last-child, #score > *:nth-last-child(2) {
+    #score > *:last-child, #score > *:nth-last-child(2), #score > *:nth-last-child(3) {
       float: right;
       text-align: right; }
   #score .message {
@@ -195,7 +199,6 @@ button {
   position: fixed;
   top: 30%;
   left: 50%;
-  transform: translate(-50%, -50%);
   z-index: 99999;
   box-shadow: 0px 0px 20px #999;
   -moz-box-shadow: 0px 0px 20px #999;

@@ -18,14 +18,37 @@ let playerCards = [],
     battleCardActive = 0,
     changeDemand = 0,
     winner = 0,
-    totalMoves = -1,
+    movesCount = -1,
     cpuWinCounter = 0,
-    gameOver = false;
-playerWinCounter = 0;
+    gameOver = false,
+    playerWinCounter = 0,
+    totalComputerWinCount = 0,
+    totalPlayerWinCount = 0,
+    totalMovesCount = 0,
+    macaoCallCount;
 
 const cardTypes = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"];
 const cardWeights = ["clubs", "diamonds", "spades", "hearts"];
 
+const ref = firebase.database().ref("/winCounter");
+ref.on("value", function (snapshot) {
+    totalComputerWinCount = snapshot.val().computerWinCount;
+    totalPlayerWinCount = snapshot.val().playerWinCount;
+    totalMovesCount = snapshot.val().totalMovesCount;
+    macaoCallCount = snapshot.val().macaoCallCount;
+    setTotalCounters();
+});
+
+function setTotalCounters() {
+    document.getElementById("total-player-win-counter").textContent = totalPlayerWinCount;
+    document.getElementById("total-cpu-win-counter").textContent = totalComputerWinCount;
+    document.getElementById("total-moves-counter").textContent = totalMovesCount;
+    document.getElementById("macao-call-counter").textContent = macaoCallCount;
+    $("#total-player-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+    $("#total-cpu-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+    $("#total-moves-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+    $("#macao-call-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+}
 
 initGame();
 
@@ -58,7 +81,7 @@ function clearAllVariables() {
         changeDemand = 0,
         winner = 0,
         gameOver = false,
-        totalMoves = -1;
+        movesCount = -1;
 }
 
 function showWhoStarts() {
@@ -79,19 +102,34 @@ function checkMacao(whoToCheck) {
 
     const macaoWindow = $("#macao");
 
-    while (macaoWindow.children().length) {
-        macaoWindow.children().last().remove();
-    }
-    if (whoToCheck == "Player" && playerCards.length == 1) {
+    if (whoToCheck == "Player" && playerCards.length == 1 && !playerWait) {
         showMacao();
     }
-    if (whoToCheck == "Computer" && cpuCards.length == 1) {
-        showMacao();
+    if (whoToCheck == "Computer" && cpuCards.length == 1 && !cpuWait) {
+        cpuCards.length == 1 && playerCards.length == 1 ? showMacao(doubleMacao) : showMacao();
     }
-
-    function showMacao() {
-        macaoWindow.append(`<h4 style="color: white; margin: 10px; padding: 10px"><4>${whoToCheck}:< /br>Macao</h4>`)
-        macaoWindow.fadeIn(800).fadeOut(900);
+    function showMacao(isDouble) {
+        
+        debugger;
+        while (macaoWindow.children().length) {
+            macaoWindow.children().last().remove();
+        }
+        if (isDouble) {
+            macaoWindow.stop();
+            macaoWindow.append(`<h4 style="color: white; margin: 10px; padding: 10px">Player: Macao!</h4><h4 style="color: white; margin: 10px; padding: 10px">Computer: Macao!</h4>`);
+            macaoCallCount += 2;
+            ref.child("macaoCallCount").set(macaoCallCount);
+            document.getElementById("macao-call-counter").textContent = macaoCallCount;
+            $("#macao-call-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+        }
+        else {
+            macaoWindow.append(`<h4 style="color: white; margin: 10px; padding: 10px">${whoToCheck}: Macao!</h4>`);
+            macaoCallCount += 1;
+            ref.child("macaoCallCount").set(macaoCallCount);
+            document.getElementById("macao-call-counter").textContent = macaoCallCount;
+            $("#macao-call-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+        }
+        macaoWindow.fadeIn(600).fadeOut(900);
     }
 }
 
@@ -182,7 +220,8 @@ function sortCards(array) {
 
 function renderCards() {
     checkMacao("Player");
-    totalMoves += 1;
+    movesCount += 1;
+    totalMovesCount += 1;
     renderPile();
     checkCardsToTake();
     renderPlayerCards();
@@ -223,11 +262,13 @@ function updateCardsCounter() {
     cpuWait ? $('.message').append(`<span>CPU has to wait ${cpuWait} ${turnsToWait}</span>`) : null;
     playerWait ? $('.message').append(`<span>You have to wait ${playerWait} ${turnsToWait}</span>`) : null;
     jackActive ? $('.message').append(`<span>Demanded card: ${chosenType}</span>`) : null;
-    lastCard.type == "Ace" ? $('.message').append(`<span>CPU changed color to ${chosenWeight}</span>`) : null;
+    lastCard.type == "ace" ? $('.message').append(`<span>CPU changed color to ${chosenWeight}</span>`) : null;
     lastCard.type == "jack" && !jackActive ? $('.message').append(`<span>No demand</span>`) : null;
     $(".message").children().length > 1 ? $(".message").animate({ fontSize: '18px' }, 200).animate({ fontSize: '16px' }, 200).css("display", "inline-block") : null;
-    $(".move-count").children().last().remove();
-    $(".move-count").append(`<span>${totalMoves}</span>`)
+    $(".moves-count").children().last().remove();
+    $(".total-moves-counter").children().last().remove();
+    $(".moves-count").append(`<span>${movesCount}</span>`);
+    $(".total-moves-counter").append(`<span>${totalMovesCount}</span>`)
 }
 
 //CPU move
@@ -301,7 +342,6 @@ function cpuMove() {
         });
 
         let kings = cpuPossibleMoves.filter((card) => {
-            console.log((card.type == "king" && card.weight == "diamonds") || (card.type == "king" && card.weight == "clubs"));
             return (card.type == "king" && card.weight == "diamonds") || (card.type == "king" && card.weight == "clubs");
         });
 
@@ -408,9 +448,6 @@ function cpuMove() {
             }
         }
         function kingsValue() {
-            console.log((kings.length && lastCard.type == "king" && lastCard.weight == "hearts"));
-            console.log((kings.length && lastCard.type == "king" && lastCard.weight == "spades"))
-
             if (kings.length && ((lastCard.type == "king" && lastCard.weight == "hearts") || (lastCard.type == "king" && lastCard.weight == "spades"))) {
                 return 15;
             }
@@ -529,16 +566,16 @@ function cpuMove() {
             }
             else {
                 cpuSelectedCards = cpuCards.filter(e => e.type == mostMoves.type);
-
+                debugger;
                 //While the first selected card does not match the card on pile - move it to the end of array
-                if (lastCard.type !== cpuSelectedCards[0].type && lastCard.type !== "Ace" && !jackActive) {
+                if (lastCard.type !== cpuSelectedCards[0].type && lastCard.type !== "ace" && !jackActive) {
                     while (cpuSelectedCards[0].weight !== lastCard.weight) {
                         const firstCard = cpuSelectedCards.shift();
                         cpuSelectedCards.push(firstCard);
                     }
                 }
-                if (chosenType !== cpuSelectedCards[0].type && lastCard.type == "Ace" && !jackActive) {
-                    while (cpuSelectedCards[0].weight !== lastCard.weight) {
+                if (chosenType !== cpuSelectedCards[0].type && lastCard.type == "ace" && !jackActive) {
+                    while (cpuSelectedCards[0].weight !== chosenWeight) {
                         const firstCard = cpuSelectedCards.shift();
                         cpuSelectedCards.push(firstCard);
                     }
@@ -669,6 +706,7 @@ function renderPlayerCards() {
         $('#playerCards').append(cardDiv);
     });
 };
+
 /*
 function renderCpuCards() {
     $('#cpuCards').empty();
@@ -812,7 +850,6 @@ $("#waitTurn").click(function () {
         waitTurn = 0;
     }
     nextTurn = 1;
-    console.log("waiteeeeeeeeeeed");
     renderCards();
 });
 
@@ -975,7 +1012,6 @@ const pickCard = function pickCard(card) {
 
             //Possible card is chosen - possible exists only if a card has been selected
             if ($(card).hasClass('possible')) {
-                debugger;
                 selectedCards = [];
                 selectedCards.push(playerCards[cardId]);
             }
@@ -1026,15 +1062,30 @@ function openWinnerBox(whoWon) {
     if (whoWon === 'player') {
         box = $('#player-win-box');
         playerWinCounter += 1;
+        totalPlayerWinCount += 1;
+        ref.child("playerWinCount").set(totalPlayerWinCount);
+        ref.child("totalMovesCount").set(totalMovesCount);
         document.getElementById("player-win-counter").textContent = playerWinCounter;
+        document.getElementById("total-player-win-counter").textContent = totalPlayerWinCount;
         $("#player-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+        $("#total-player-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
     }
     else {
         box = $('#cpu-win-box');
         cpuWinCounter += 1;
+        totalComputerWinCount += 1;
+        ref.child("computerWinCount").set(totalComputerWinCount);
+        ref.child("totalMovesCount").set(totalMovesCount);
         document.getElementById("cpu-win-counter").textContent = cpuWinCounter;
+        document.getElementById("total-cpu-win-counter").textContent = totalComputerinCount
         $("#cpu-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+        $("#total-cpu-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
     }
+
+    function updateTotalMoves() {
+
+    }
+
     gameOver = true;
 
     //Fade in the Popup and add close button
@@ -1194,7 +1245,12 @@ function styleAvailableCards() {
 };
 
 function stylePossibleCards() {
-    possibleCards.forEach((card, idx) => $('#playerCards').find("#" + idx).addClass("possible"));
+    possibleCards.forEach((card, idx) => {
+        const cardToStyle = $('#playerCards').find("#" + idx);
+        if (!cardToStyle.hasClass('available')) {
+            cardToStyle.addClass('possible');
+        }
+    });
 }
 
 function styleSelectedCards() {
