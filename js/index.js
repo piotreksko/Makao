@@ -753,6 +753,11 @@ function renderPile() {
     }
 };
 
+$("#restart-game").click(function () {
+    updateCardsCounter();
+    initGame();
+});
+
 //Open rules window
 $("#open-rules").click(function () {
     $('#rules').fadeIn(600);
@@ -763,6 +768,7 @@ $("#close-rules").click(function () {
 });
 
 $("#open-rules").attr('title', 'Macao rules');
+$("#restart-game").attr('title', 'Restart game');
 
 //Confirm selected cards
 $("#confirmCards").click(function () {
@@ -809,7 +815,7 @@ $("#confirmCards").click(function () {
         }
 
         //Remove cards from playerCards
-        var cardIndexInPlayerCards = playerCards.indexOf(card);
+        let cardIndexInPlayerCards = playerCards.indexOf(card);
         playerCards.splice(cardIndexInPlayerCards, 1);
     });
 
@@ -1291,7 +1297,7 @@ function addMask() {
 https://codepen.io/gamanox/pen/FkEbH
 */
 function throwConfetti() {
-    var COLORS, Confetti, NUM_CONFETTI, PI_2, canvas, confetti, context, drawCircle, drawCircle2, drawCircle3, i, range, xpos;
+    let COLORS, Confetti, NUM_CONFETTI, PI_2, canvas, confetti, context, drawCircle, drawCircle2, drawCircle3, i, range, xpos;
 
     NUM_CONFETTI = 40;
 
@@ -1384,7 +1390,7 @@ function throwConfetti() {
         };
 
         Confetti.prototype.draw = function () {
-            var ref;
+            let ref;
             this.x += this.vx;
             this.y += this.vy;
             this.opacity += this.dop;
@@ -1408,7 +1414,7 @@ function throwConfetti() {
     })();
 
     confetti = (function () {
-        var j, ref, results;
+        let j, ref, results;
         results = [];
         for (i = j = 1, ref = NUM_CONFETTI; 1 <= ref ? j <= ref : j >= ref; i = 1 <= ref ? ++j : --j) {
             results.push(new Confetti);
@@ -1417,7 +1423,7 @@ function throwConfetti() {
     })();
 
     window.step = function () {
-        var c, j, len, results;
+        let c, j, len, results;
         requestAnimationFrame(step);
         context.clearRect(0, 0, w, h);
         results = [];
@@ -1435,7 +1441,7 @@ function throwConfetti() {
 
     // fade in
     canvas.style.opacity = 0;
-    var tick = function () {
+    let tick = function () {
         canvas.style.opacity = +canvas.style.opacity + 0.01;
         if (+canvas.style.opacity < 1) {
             (window.requestAnimationFrame &&

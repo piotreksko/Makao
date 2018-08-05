@@ -77,6 +77,8 @@ body {
     #score > *:last-child, #score > *:nth-last-child(2), #score > *:nth-last-child(3) {
       float: right;
       text-align: left; }
+    #score > *:first-child {
+      margin-right: 5px; }
   #score .message {
     margin-left: 20px;
     display: none; }

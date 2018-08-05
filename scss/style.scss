@@ -92,6 +92,9 @@ body {
             float: right;
             text-align: left;
         }
+        &:first-child {
+            margin-right: 5px;
+        }
     }
 
     .message {
