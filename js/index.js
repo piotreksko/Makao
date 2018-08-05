@@ -25,29 +25,40 @@ let playerCards = [],
     totalComputerWinCount = 0,
     totalPlayerWinCount = 0,
     totalMovesCount = 0,
-    macaoCallCount;
+    macaoCallCount = 0;
 
 const cardTypes = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"];
 const cardWeights = ["clubs", "diamonds", "spades", "hearts"];
 
 const ref = firebase.database().ref("/winCounter");
+
+getGlobalCounters();
+
+function getGlobalCounters() {
 ref.on("value", function (snapshot) {
     totalComputerWinCount = snapshot.val().computerWinCount;
     totalPlayerWinCount = snapshot.val().playerWinCount;
-    totalMovesCount = snapshot.val().totalMovesCount;
-    macaoCallCount = snapshot.val().macaoCallCount;
+
+    //Only overwrite at the game start - dont overwrite from realtime database updates
+    if (totalMovesCount == 0) {
+        totalMovesCount = snapshot.val().totalMovesCount;
+    }
+    if (macaoCallCount == 0) {
+        macaoCallCount = snapshot.val().macaoCallCount;
+    }
     setTotalCounters();
-});
+    });
+};
 
 function setTotalCounters() {
     document.getElementById("total-player-win-counter").textContent = totalPlayerWinCount;
     document.getElementById("total-cpu-win-counter").textContent = totalComputerWinCount;
     document.getElementById("total-moves-counter").textContent = totalMovesCount;
     document.getElementById("macao-call-counter").textContent = macaoCallCount;
-    $("#total-player-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
-    $("#total-cpu-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
-    $("#total-moves-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
-    $("#macao-call-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+    $("#total-player-win-counter").animate({ fontSize: '10px' }, 200).animate({ fontSize: '14px' }, 200);
+    $("#total-cpu-win-counter").animate({ fontSize: '10px' }, 200).animate({ fontSize: '14px' }, 200);
+    $("#total-moves-counter").animate({ fontSize: '10px' }, 200).animate({ fontSize: '14px' }, 200);
+    $("#macao-call-counter").animate({ fontSize: '10px' }, 200).animate({ fontSize: '14px' }, 200);
 }
 
 initGame();
@@ -106,11 +117,10 @@ function checkMacao(whoToCheck) {
         showMacao();
     }
     if (whoToCheck == "Computer" && cpuCards.length == 1 && !cpuWait) {
-        cpuCards.length == 1 && playerCards.length == 1 ? showMacao(doubleMacao) : showMacao();
+        cpuCards.length == 1 && playerCards.length == 1 ? showMacao(true) : showMacao();
     }
     function showMacao(isDouble) {
         
-        debugger;
         while (macaoWindow.children().length) {
             macaoWindow.children().last().remove();
         }
@@ -120,14 +130,14 @@ function checkMacao(whoToCheck) {
             macaoCallCount += 2;
             ref.child("macaoCallCount").set(macaoCallCount);
             document.getElementById("macao-call-counter").textContent = macaoCallCount;
-            $("#macao-call-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+            $("#macao-call-counter").animate({ fontSize: '10px' }, 200).animate({ fontSize: '14px' }, 200);
         }
         else {
             macaoWindow.append(`<h4 style="color: white; margin: 10px; padding: 10px">${whoToCheck}: Macao!</h4>`);
             macaoCallCount += 1;
             ref.child("macaoCallCount").set(macaoCallCount);
             document.getElementById("macao-call-counter").textContent = macaoCallCount;
-            $("#macao-call-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+            $("#macao-call-counter").animate({ fontSize: '10px' }, 200).animate({ fontSize: '14px' }, 200);
         }
         macaoWindow.fadeIn(600).fadeOut(900);
     }
@@ -262,13 +272,11 @@ function updateCardsCounter() {
     cpuWait ? $('.message').append(`<span>CPU has to wait ${cpuWait} ${turnsToWait}</span>`) : null;
     playerWait ? $('.message').append(`<span>You have to wait ${playerWait} ${turnsToWait}</span>`) : null;
     jackActive ? $('.message').append(`<span>Demanded card: ${chosenType}</span>`) : null;
-    lastCard.type == "ace" ? $('.message').append(`<span>CPU changed color to ${chosenWeight}</span>`) : null;
+    lastCard.type == "ace" ? $('.message').append(`<span>Computer changed color to ${chosenWeight}</span>`) : null;
     lastCard.type == "jack" && !jackActive ? $('.message').append(`<span>No demand</span>`) : null;
     $(".message").children().length > 1 ? $(".message").animate({ fontSize: '18px' }, 200).animate({ fontSize: '16px' }, 200).css("display", "inline-block") : null;
-    $(".moves-count").children().last().remove();
-    $(".total-moves-counter").children().last().remove();
-    $(".moves-count").append(`<span>${movesCount}</span>`);
-    $(".total-moves-counter").append(`<span>${totalMovesCount}</span>`)
+    $("#moves-count").html(movesCount);
+    $("#total-moves-counter").html(totalMovesCount)
 }
 
 //CPU move
@@ -278,7 +286,7 @@ function cpuMove() {
     //Do nothing if its not CPU`s turn
     if (!nextTurn) return
 
-    console.log(cpuCards);
+    //console.log(cpuCards);
 
     let cardsToUse = [],
         cpuAvailableCards = [],
@@ -289,11 +297,11 @@ function cpuMove() {
     if (jackActive) {
         cpuAvailableCards = cpuCards.filter((card) => "jack" == card.type || card.type == chosenType);
     }
-    console.log(cpuAvailableCards);
+    //console.log(cpuAvailableCards);
 
     //IF CPU does have available cards
     if (cpuAvailableCards.length) {
-        console.log("cpu had available cards");
+        //console.log("cpu had available cards");
 
         //Map all cards to get information about cards of same type & weight
         let cpuPossibleMoves = cpuAvailableCards.map(function (card) {
@@ -350,11 +358,11 @@ function cpuMove() {
             cardsToUse = jacks;
         }
 
-        console.log(neutralCards);
-        console.log(battleCards);
-        console.log(fours);
-        console.log(jacks);
-        console.log(aces);
+        //console.log(neutralCards);
+        //console.log(battleCards);
+        //console.log(fours);
+        //console.log(jacks);
+        //console.log(aces);
 
         let cardsDifference;
         cpuCards.length - playerCards.length > 0 ? cardsDifference = cpuCards.length - playerCards.length : cardsDifference = 0;
@@ -369,9 +377,9 @@ function cpuMove() {
         let acesChance = acesValue();
         let kingsChance = kingsValue();
 
-        console.log(battleCardActive);
-        console.log(waitTurn);
-        console.log(neutralCards.length);
+        //console.log(battleCardActive);
+        //console.log(waitTurn);
+        //console.log(neutralCards.length);
 
         function neutralValue() {
             if (neutralCards.length === 0 || battleCardActive || waitTurn || cpuWait) {
@@ -427,12 +435,10 @@ function cpuMove() {
             }
             else {
                 let jacksWeight = 24;
-                console.log(jacksWeight);
                 let jackNeutralRatio = 1
                 if (neutralCards.length) {
                     jackNeutralRatio = jacksWeight / neutralCards.length;
                 };
-                console.log(jacksWeight / cardsDifference);
                 let value = jacks.length * jackNeutralRatio + (cardsDifference / jacksWeight) * 3 + (jacksWeight / playerCards.length) * 2;
                 return value
             }
@@ -455,11 +461,12 @@ function cpuMove() {
                 return 0;
             }
         }
-        console.log(neutralChance);
-        console.log(battleChance);
-        console.log(foursChance);
-        console.log(jacksChance);
-        console.log(acesChance);
+        //For AI improvement
+        //console.log(neutralChance);
+        //console.log(battleChance);
+        //console.log(foursChance);
+        //console.log(jacksChance);
+        //console.log(acesChance);
 
         let min = 0;
         let max = neutralChance + battleChance + foursChance + jacksChance + acesChance + kingsChance;
@@ -529,20 +536,20 @@ function cpuMove() {
             jackActive -= 1;
         }
 
-        console.log("randomNumber");
-        console.log(randomNumber);
-        console.log("neutralRange");
-        console.log(neutralRange);
-        console.log("battleRange");
-        console.log(battleRange);
-        console.log("foursRange");
-        console.log(foursRange);
-        console.log("jacksRange");
-        console.log(jacksRange);
-        console.log("acesRange");
-        console.log(acesRange);
-        console.log("kingsRange");
-        console.log(kingsRange);
+        //console.log("randomNumber");
+        //console.log(randomNumber);
+        //console.log("neutralRange");
+        //console.log(neutralRange);
+        //console.log("battleRange");
+        //console.log(battleRange);
+        //console.log("foursRange");
+        //console.log(foursRange);
+        //console.log("jacksRange");
+        //console.log(jacksRange);
+        //console.log("acesRange");
+        //console.log(acesRange);
+        //console.log("kingsRange");
+        //console.log(kingsRange);
 
         if (randomNumber == 0) {
             cpuNoCardsToUse();
@@ -551,12 +558,12 @@ function cpuMove() {
 
         else {
 
-            console.log("cardsToUse");
-            console.log(cardsToUse);
+            //console.log("cardsToUse");
+            //console.log(cardsToUse);
             let mostMoves = cardsToUse.reduce((prev, curr) => prev.possibleCardsAfter < curr.possibleCardsAfter ? prev : curr);
 
-            console.log("mostMoves");
-            console.log(mostMoves);
+            //console.log("mostMoves");
+            //console.log(mostMoves);
 
             let cpuSelectedCards = [];
 
@@ -581,7 +588,7 @@ function cpuMove() {
                     }
                 }
             }
-            console.log(cpuSelectedCards);
+            //console.log(cpuSelectedCards);
             cpuSelectedCards.forEach((card, idx) => {
                 let notCheckedYet = 1;
                 switch (card.type) {
@@ -600,8 +607,11 @@ function cpuMove() {
                         if (neutralCards.length) {
                             debugger;
                             chosenType = (neutralCards.reduce((prev, curr) => prev.sameTypeAmount < curr.sameTypeAmount ? prev : curr)).type;
-                            console.log("chosenType");
-                            console.log(chosenType);
+                            if (chosenType.type == "king") {
+                                chosenType = 0;
+                            }
+                            //console.log("chosenType");
+                            //console.log(chosenType);
                         };
                         chosenType ? jackActive = 2 : jackActive = 0;
                         break;
@@ -610,8 +620,8 @@ function cpuMove() {
                             let cpuCardsWithoutMostMoves = [...cpuCards];
                             cpuCardsWithoutMostMoves.splice(cpuCardsWithoutMostMoves.indexOf(mostMoves), 1);
                             if (cpuCards.length > 1) chosenWeight = (cpuCardsWithoutMostMoves.reduce((prev, curr) => prev.sameWeightAmount < curr.sameWeightAmount ? prev : curr)).weight;
-                            console.log("chosenWeight");
-                            console.log(chosenWeight);
+                            //console.log("chosenWeight");
+                            //console.log(chosenWeight);
                         }
                         break;
                     case "king":
@@ -645,7 +655,7 @@ function cpuMove() {
 }
 
 function cpuNoCardsToUse() {
-    console.log("no cards available");
+    //console.log("no cards available");
     //Take cards from pile and shuffle the deck if there is one card left
 
     if (jackActive) {
@@ -1067,8 +1077,8 @@ function openWinnerBox(whoWon) {
         ref.child("totalMovesCount").set(totalMovesCount);
         document.getElementById("player-win-counter").textContent = playerWinCounter;
         document.getElementById("total-player-win-counter").textContent = totalPlayerWinCount;
-        $("#player-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
-        $("#total-player-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+        $("#player-win-counter").animate({ fontSize: '10px' }, 200).animate({ fontSize: '14px' }, 200);
+        $("#total-player-win-counter").animate({ fontSize: '10px' }, 200).animate({ fontSize: '14px' }, 200);
     }
     else {
         box = $('#cpu-win-box');
@@ -1077,9 +1087,9 @@ function openWinnerBox(whoWon) {
         ref.child("computerWinCount").set(totalComputerWinCount);
         ref.child("totalMovesCount").set(totalMovesCount);
         document.getElementById("cpu-win-counter").textContent = cpuWinCounter;
-        document.getElementById("total-cpu-win-counter").textContent = totalComputerinCount
-        $("#cpu-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
-        $("#total-cpu-win-counter").animate({ fontSize: '18px' }, 200).animate({ fontSize: '14px' }, 200);
+        document.getElementById("total-cpu-win-counter").textContent = totalComputerWinCount
+        $("#cpu-win-counter").animate({ fontSize: '10px' }, 200).animate({ fontSize: '14px' }, 200);
+        $("#total-cpu-win-counter").animate({ fontSize: '10px' }, 200).animate({ fontSize: '14px' }, 200);
     }
 
     function updateTotalMoves() {
