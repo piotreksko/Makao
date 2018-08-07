@@ -8,6 +8,9 @@ Things to do in this project:
 * Add more features e.g. more AI players
 * Convert to another framework.
 
+## [Live Demo](https://makao-win-counter.firebaseapp.com/)
+
+
 
 ## About 
 In this game you can play a 1v1 game of a cards game called [Macao](https://en.wikipedia.org/wiki/Macau_(card_game)) ]
