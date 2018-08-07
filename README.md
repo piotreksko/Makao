@@ -43,7 +43,7 @@ AI example
 ```
 Computer has 5 cards. Player has 8 cards.
 Player uses 10 of hearts. 
-Out of all computers' cards he can use 10 of Hearts, 3 of Hearts or Jack of Hearts. 
+Out of all computers' cards he can use 10 of Spades, 3 of Hearts or Jack of Hearts. 
 8 is a neutral card, 3 is a battle card and Jack is an action card.
 Computer calculates probability ranges for all the types.
 The range for neutral card will be 1 to 30, for battle card 30 to 43, for jack from 43 to 83.
