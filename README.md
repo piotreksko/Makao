@@ -48,7 +48,7 @@ Out of all computers' cards he can use 10 of Hearts, 3 of Hearts or Jack of Hear
 Computer calculates probability ranges for all the types.
 The range for neutral card will be 1 to 30, for battle card 30 to 43, for jack from 43 to 83.
 Computer gets a random number between 1 and 83 - it get's 57.
-57 is withing jack range therefore the card to use will be Jack of Hearts.
+57 is within jack range therefore the card to use will be Jack of Hearts.
 ```
 
 ## Game rules in this Macao version
