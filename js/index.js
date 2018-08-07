@@ -1299,7 +1299,7 @@ https://codepen.io/gamanox/pen/FkEbH
 function throwConfetti() {
     let COLORS, Confetti, NUM_CONFETTI, PI_2, canvas, confetti, context, drawCircle, drawCircle2, drawCircle3, i, range, xpos;
 
-    NUM_CONFETTI = 40;
+    NUM_CONFETTI = 80;
 
     COLORS = [[255, 255, 255], [255, 144, 0], [255, 255, 255], [255, 144, 0], [0, 277, 235]];
 
