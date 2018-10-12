@@ -22,6 +22,8 @@ const ref = firebase.database().ref("/winCounter");
 
 class StatsCounter {
   constructor() {
+    this.playerWinCounter = 0;
+    this.cpuWinCounter = 0;
     this.totalPlayerWinCount = 0;
     this.totalComputerWinCount = 0;
     this.totalMovesCount = 0;
@@ -119,11 +121,10 @@ class GameState {
         macaoWindow.append(
           `<h4 style="color: white; margin: 10px; padding: 10px">Player: Macao!</h4><h4 style="color: white; margin: 10px; padding: 10px">Computer: Macao!</h4>`
         );
-        macaoCallCount += 2;
-        ref.child("macaoCallCount").set(macaoCallCount);
-        document.getElementById(
-          "macao-call-counter"
-        ).textContent = macaoCallCount;
+        statsCounter.macaoCallCount += 2;
+        ref.child("macaoCallCount").set(statsCounter.macaoCallCount);
+        document.getElementById("macao-call-counter").textContent =
+          gameState.macaoCallCount;
         $("#macao-call-counter")
           .animate({ fontSize: "10px" }, 200)
           .animate({ fontSize: "14px" }, 200);
@@ -131,11 +132,10 @@ class GameState {
         macaoWindow.append(
           `<h4 style="color: white; margin: 10px; padding: 10px">${whoToCheck}: Macao!</h4>`
         );
-        macaoCallCount += 1;
-        ref.child("macaoCallCount").set(macaoCallCount);
-        document.getElementById(
-          "macao-call-counter"
-        ).textContent = macaoCallCount;
+        statsCounter.macaoCallCount += 1;
+        ref.child("macaoCallCount").set(statsCounter.macaoCallCount);
+        document.getElementById("macao-call-counter").textContent =
+          gameState.macaoCallCount;
         $("#macao-call-counter")
           .animate({ fontSize: "10px" }, 200)
           .animate({ fontSize: "14px" }, 200);
@@ -401,11 +401,11 @@ class Player {
 
       //Adjust available cards according to chosen card
 
-      this.cards.forEach(function(card, idx) {
+      this.cards.forEach((card, idx) => {
         //Get available cards with the same type as chosen card
-        if (card.type == gameState.chosenCard.type) {
+
+        if (card.type == chosenCard.type)
           this.availableCards.push(this.cards[idx]);
-        }
 
         //If type or weight is the same last card and it does not have .available class and jack is not active
         if (
@@ -470,7 +470,7 @@ class Player {
 
   styleSelectedCards() {
     this.selectedCards.forEach(selectedCard => {
-      playerCards.forEach((playerCard, idx) => {
+      this.cards.forEach((playerCard, idx) => {
         if (
           selectedCard.type == playerCard.type &&
           selectedCard.weight == playerCard.weight
@@ -511,8 +511,10 @@ class CpuPlayer {
     this.wait = 0;
     this.availableCards = [];
   }
+
   //CPU move
   move() {
+    pile.updateLastCard();
     this.cards = sortCards(this.cards);
 
     //Do nothing if its not CPU`s turn
@@ -523,11 +525,14 @@ class CpuPlayer {
 
     pile.lastCard.type == "ace"
       ? (this.availableCards = this.cards.filter(
-          card => card.weight == chosenWeight || card.type == pile.lastCard.type
+          card =>
+            card.weight == gameState.chosenWeight ||
+            card.type == pile.lastCard.type
         ))
       : (this.availableCards = this.cards.filter(
           card =>
-            card.weight == lastCard.weight || card.type == pile.lastCard.type
+            card.weight == pile.lastCard.weight ||
+            card.type == pile.lastCard.type
         ));
 
     if (gameState.jackActive) {
@@ -545,18 +550,18 @@ class CpuPlayer {
         return {
           type: card.type,
           weight: card.weight,
-          sameTypeAmount: (function() {
+          sameTypeAmount: (() => {
             let amount = 0;
-            this.cards.forEach(function(e) {
+            this.cards.forEach(e => {
               if (e.type === card.type) {
                 amount += 1;
               }
             });
             return amount - 1;
           })(),
-          sameWeightAmount: (function() {
+          sameWeightAmount: (() => {
             let moves = 0;
-            this.cards.forEach(function(e) {
+            this.cards.forEach(e => {
               if (e.weight === card.weight) {
                 moves += 1;
               }
@@ -629,7 +634,7 @@ class CpuPlayer {
           neutralCards.length === 0 ||
           gameState.battleCardActive ||
           gameState.waitTurn ||
-          this.wait
+          cpuPlayer.wait
         ) {
           return 0;
         } else {
@@ -642,7 +647,7 @@ class CpuPlayer {
         if (
           battleCards.length === 0 ||
           gameState.waitTurn ||
-          this.wait ||
+          cpuPlayer.wait ||
           gameState.jackActive
         ) {
           return 0;
@@ -659,12 +664,12 @@ class CpuPlayer {
           fours.length === 0 ||
           gameState.battleCardActive ||
           gameState.jackActive ||
-          this.wait
+          cpuPlayer.wait
         ) {
           return 0;
         } else {
           let weight = 1;
-          let foursOnPile = pile.filter(x => x.type === "4").length;
+          let foursOnPile = pile.cards.filter(x => x.type === "4").length;
           let foursLeft = checkFours();
 
           function checkFours() {
@@ -688,7 +693,7 @@ class CpuPlayer {
           jacks.length === 0 ||
           gameState.battleCardActive ||
           gameState.waitTurn ||
-          this.Wait
+          cpuPlayer.Wait
         ) {
           return 0;
         } else {
@@ -709,7 +714,7 @@ class CpuPlayer {
           aces.length === 0 ||
           gameState.battleCardActive ||
           gameState.waitTurn ||
-          this.wait ||
+          cpuPlayer.wait ||
           gameState.jackActive
         ) {
           return 0;
@@ -717,7 +722,7 @@ class CpuPlayer {
           let weight = 3;
           let value =
             aces.length * weight +
-            (this.cards.length / this.availableCards.length) * weight;
+            (cpuPlayer.cards.length / cpuPlayer.availableCards.length) * weight;
           return value;
         }
       }
@@ -797,8 +802,8 @@ class CpuPlayer {
         weightPicked = 4;
       }
 
-      if (jackActive && weightPicked !== 4) {
-        jackActive -= 1;
+      if (gameState.jackActive && weightPicked !== 4) {
+        gameState.jackActive -= 1;
       }
 
       if (randomNumber == 0) {
@@ -815,7 +820,9 @@ class CpuPlayer {
           this.availableCards = [];
           cpuSelectedCards.push(mostMoves);
         } else {
-          cpuSelectedCards = cpuCards.filter(e => e.type == mostMoves.type);
+          cpuSelectedCards = cpuPlayer.cards.filter(
+            e => e.type == mostMoves.type
+          );
 
           //While the first selected card does not match the card on pile - move it to the end of array
           if (
@@ -833,7 +840,7 @@ class CpuPlayer {
             pile.lastCard.type == "ace" &&
             !gameState.jackActive
           ) {
-            while (cpuSelectedCards[0].weight !== chosenWeight) {
+            while (cpuSelectedCards[0].weight !== gameState.chosenWeight) {
               const firstCard = cpuSelectedCards.shift();
               cpuSelectedCards.push(firstCard);
             }
@@ -850,7 +857,7 @@ class CpuPlayer {
               if (gameState.nobodyIsWaiting()) gameState.cardsToTake += 3;
               break;
             case "4":
-              waitTurn += 1;
+              gameState.waitTurn += 1;
               break;
             case "jack":
               if (neutralCards.length) {
@@ -875,7 +882,7 @@ class CpuPlayer {
                   cpuCardsWithoutMostMoves.indexOf(mostMoves),
                   1
                 );
-                if (this.ards.length > 1)
+                if (this.cards.length > 1)
                   gameState.chosenWeight = cpuCardsWithoutMostMoves.reduce(
                     (prev, curr) =>
                       prev.sameWeightAmount < curr.sameWeightAmount
@@ -902,7 +909,7 @@ class CpuPlayer {
               }
           }
 
-          let indexInCpuCards = cpuCards.findIndex(
+          let indexInCpuCards = cpuPlayer.cards.findIndex(
             x => x.type == card.type && x.weight == card.weight
           );
           this.cards.splice(indexInCpuCards, 1);
@@ -913,7 +920,7 @@ class CpuPlayer {
     } else {
       this.noCardsToUse();
     }
-    nextTurn = 0;
+    gameState.nextTurn = 0;
   }
   noCardsToUse() {
     //console.log("no cards available");
@@ -942,7 +949,7 @@ class CpuPlayer {
           pile.cards.slice(-1);
         }
         for (let i = 1; i < gameState.cardsToTake; i++) {
-          cardFromDeck = deck.cards[0];
+          const cardFromDeck = deck.cards[0];
           deck.cards.shift();
           this.cards.push(cardFromDeck);
         }
@@ -957,11 +964,11 @@ class CpuPlayer {
           deck.cards = deck.cards.concat(shuffledCards);
           pile.cards.splice(0, deck.cards.length - 2);
         }
-        cardFromDeck = deck.cards[0];
+        const cardFromDeck = deck.cards[0];
         deck.cards.shift();
         this.cards.push(cardFromDeck);
       }
-      cardsToTake = 1;
+      gameState.cardsToTake = 1;
     }
   }
   /*Show CPU cards
@@ -1177,7 +1184,7 @@ $("#confirmCards").click(function() {
         if (gameState.nobodyIsWaiting()) gameState.cardsToTake += 3;
         break;
       case "4":
-        if (!cpuWait) {
+        if (!cpuPlayer.wait) {
           gameState.waitTurn += 1;
         }
         break;
@@ -1230,7 +1237,7 @@ $("#confirmCards").click(function() {
   }
 
   if (!gameState.aceActive && !gameState.jackActive) {
-    gameState.renderCards();
+    renderCards();
   }
 
   if (gameState.jackActive && pile.lastCard.type !== "jack") {
@@ -1392,12 +1399,11 @@ function openBox(boxType) {
 
 //Click on your own card
 const pickCard = function pickCard(card) {
-  const cardId = $(card).attr("id");
-
+  const cardId = Number($(card).attr("id"));
   //Check if clicked card is available
   player.availableCards.forEach(availableCard => {
     if (
-      player.availableCard.type == player.cards[cardId].type &&
+      availableCard.type == player.cards[cardId].type &&
       availableCard.weight == player.cards[cardId].weight
     ) {
       //Card has not been selected yet
@@ -1450,14 +1456,15 @@ function openWinnerBox(whoWon) {
 
   if (whoWon === "player") {
     box = $("#player-win-box");
-    globalStats.playerWinCounter += 1;
-    globalStats.totalPlayerWinCount += 1;
-    ref.child("playerWinCount").set(totalPlayerWinCount);
-    ref.child("totalMovesCount").set(totalMovesCount);
+    debugger;
+    statsCounter.playerWinCounter += 1;
+    statsCounter.totalPlayerWinCount += 1;
+    ref.child("playerWinCount").set(statsCounter.totalPlayerWinCount);
+    ref.child("totalMovesCount").set(statsCounter.totalMovesCount);
     document.getElementById("player-win-counter").textContent =
-      globalStats.playerWinCounter;
+      statsCounter.playerWinCounter;
     document.getElementById("total-player-win-counter").textContent =
-      globalStats.totalPlayerWinCount;
+      statsCounter.totalPlayerWinCount;
     $("#player-win-counter")
       .animate({ fontSize: "10px" }, 200)
       .animate({ fontSize: "14px" }, 200);
@@ -1466,14 +1473,14 @@ function openWinnerBox(whoWon) {
       .animate({ fontSize: "14px" }, 200);
   } else {
     box = $("#cpu-win-box");
-    globalStats.cpuWinCounter += 1;
-    globalStats.totalComputerWinCount += 1;
-    ref.child("computerWinCount").set(globalStats.totalComputerWinCount);
-    ref.child("totalMovesCount").set(globalStats.totalMovesCount);
+    statsCounter.cpuWinCounter += 1;
+    statsCounter.totalComputerWinCount += 1;
+    ref.child("computerWinCount").set(statsCounter.totalComputerWinCount);
+    ref.child("totalMovesCount").set(statsCounter.totalMovesCount);
     document.getElementById("cpu-win-counter").textContent =
-      globalStats.cpuWinCounter;
+      statsCounter.cpuWinCounter;
     document.getElementById("total-cpu-win-counter").textContent =
-      globalStats.totalComputerWinCount;
+      statsCounter.totalComputerWinCount;
     $("#cpu-win-counter")
       .animate({ fontSize: "10px" }, 200)
       .animate({ fontSize: "14px" }, 200);
