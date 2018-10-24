@@ -942,7 +942,7 @@ class CpuPlayer {
       if (gameState.cardsToTake > 1) {
         //Shuffle the deck if there are not enough cards remaining in the deck
         if (gameState.cardsToTake >= deck.cards.length) {
-          let cardsForShuffle = pile.cards;
+        let cardsForShuffle = pile.cards;
           cardsForShuffle.pop();
           let shuffledCards = shuffle(cardsForShuffle);
           deck.cards = deck.cards.concat(shuffledCards);
@@ -958,8 +958,8 @@ class CpuPlayer {
       //Take one card - default amount
       else {
         if (deck.cards.length === 1) {
-          let cardsForShuffle = pile.cards;
-          cardsForShuffle.pop;
+        let cardsForShuffle = pile.cards;
+          cardsForShuffle.pop();
           let shuffledCards = shuffle(cardsForShuffle);
           deck.cards = deck.cards.concat(shuffledCards);
           pile.cards.splice(0, deck.cards.length - 2);
@@ -1292,7 +1292,7 @@ $("#deck").click(function(cardFromDeck) {
         let cardsForShuffle = pile.cards;
         cardsForShuffle.pop;
         let shuffledCards = shuffle(cardsForShuffle);
-        deck = deck.concat(shuffledCards);
+        deck = deck.cards.concat(shuffledCards);
         pile.cards.splice(0, deck.cards.length - 2);
       }
 
@@ -1456,7 +1456,6 @@ function openWinnerBox(whoWon) {
 
   if (whoWon === "player") {
     box = $("#player-win-box");
-    debugger;
     statsCounter.playerWinCounter += 1;
     statsCounter.totalPlayerWinCount += 1;
     ref.child("playerWinCount").set(statsCounter.totalPlayerWinCount);

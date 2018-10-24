@@ -1,16 +1,10 @@
 # Macao
 
 My favorite cards game - Makao. 
-Things to do in this project: 
-
-* Improve AI algorithm
-* Improve cards highlighting
-* Add more features e.g. more AI players
-* Convert to another framework.
 
 ## [Live Demo](https://makao-win-counter.firebaseapp.com/)
 
-
+![Demo](demo.gif)
 
 ## About 
 In this game you can play a 1v1 game of a cards game called [Macao](https://en.wikipedia.org/wiki/Macau_(card_game)) ]
@@ -76,3 +70,10 @@ Computer gets a random number between 1 and 83 - it get's 57.
 * If an Ace is played, the player playing the Ace can call a suit suit of choice.
 
 Multiples action cards can be played, i.e. Player 1 plays three 2s and the next player in sequence must pick up 6 cards unless they have another 2. This is the same for 3's, 4's and Kings.
+
+### Things to improve:
+
+* AI algorithm
+* Cards highlighting
+* More features e.g. more AI players
+* Convert to another framework.
