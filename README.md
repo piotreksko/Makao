@@ -1,4 +1,4 @@
-# Macao
+# Makao
 
 My favorite cards game - Makao. 
 
